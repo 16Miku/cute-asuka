@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-akane: var(--akane);
+  --color-akane-foreground: var(--akane-foreground);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, "Hiragino Sans", "Noto Sans SC", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+:root {
+  --background: #fff8fb;
+  --foreground: #2e2a2d;
+  --muted: #fbe9ef;
+  --muted-foreground: #7a6b72;
+  --card: #ffffff;
+  --border: #f3dce5;
+  --primary: #f7aec3;
+  --accent: #e48aa6;
+  --akane: #ffb3c6;
+  --akane-foreground: #4a2a36;
+
+  --font-geist-sans: var(--font-sans), ui-sans-serif, system-ui, "Hiragino Sans", "Noto Sans SC", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-geist-mono: var(--font-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.dark {
+  --background: #181014;
+  --foreground: #f7ecf1;
+  --muted: #23161c;
+  --muted-foreground: #b39ba4;
+  --card: #1e141b;
+  --border: #3d2933;
+  --primary: #d97a9a;
+  --accent: #b85d7a;
+  --akane: #c77996;
+  --akane-foreground: #ffd5e4;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
