@@ -191,20 +191,20 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="rounded-3xl border border-border bg-gradient-to-br from-rose-50 to-pink-50 px-6 py-10 text-center dark:from-zinc-900 dark:to-zinc-800">
+        <div className="rounded-3xl border border-border bg-gradient-to-br from-rose-50 to-pink-50 px-6 py-10 text-center dark:from-rose-950/50 dark:to-pink-950/50 dark:border-rose-800/30">
           <p className="text-sm text-muted-foreground">
             想查看更多表情包与每日更新？直接进入 Gallery 或 Daily。
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/gallery"
-              className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-akane-foreground transition hover:brightness-110"
+              className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110"
             >
               前往 Gallery
             </Link>
             <Link
               href="/daily"
-              className="rounded-full border border-border px-5 py-2.5 text-sm transition hover:border-accent"
+              className="rounded-full border border-border bg-card px-5 py-2.5 text-sm transition hover:border-accent"
             >
               前往 Daily
             </Link>
