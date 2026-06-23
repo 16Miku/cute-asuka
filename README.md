@@ -113,7 +113,10 @@ npm run lint     # ESLint 代码检查
 
 ```
 cute-asuka/
-├── public/images/              # 表情包素材 (200+)
+├── public/
+│   ├── images/              # 表情包素材 (200+)
+│   ├── web-banner/          # 桌面端轮播图素材
+│   └── sp-banner/           # 移动端轮播图素材
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx            # 首页 (轮播图 Hero)
@@ -159,6 +162,7 @@ cute-asuka/
 - **样式**: 统一使用 Tailwind CSS 与主题变量
 - **提交信息**: 使用语义化中文提交，例如 `feat(gallery): 增加置顶功能`
 - **分支**: 使用 `master` 主分支
+- **轮播图素材规范**: 桌面端图片存放于 `public/web-banner/`，移动端图片存放于 `public/sp-banner/`，并在 `src/app/page.tsx` 中分别引入到 `desktopHeroImages` 和 `mobileHeroImages` 数组中
 
 ---
 
@@ -185,7 +189,10 @@ cute-asuka/
 - 🚀 适配 Render 静态部署
 
 ### v1.1 (2025-06-24)
-...
+- 🎠 首页 Hero 背景改为轮播图（5 张精选，淡入淡出）
+- 🗑 清理 98MB 大文件，Git 历史瘦身
+- ⚡ API 性能优化（静态缓存）
+- 🔧 Gallery 交互增强（ESC 关闭、懒加载）
 
 ---
 
