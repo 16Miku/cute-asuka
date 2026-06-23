@@ -18,60 +18,40 @@ export default function HeroCarousel({
   showArrows = true,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     if (images.length <= 1) return;
     const timer = setInterval(() => {
-      setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, interval);
     return () => clearInterval(timer);
   }, [images.length, interval]);
 
   const navigate = useCallback(
-    (newDirection: number) => {
-      setDirection(newDirection);
+    (step: number) => {
       setCurrentIndex((prev) => {
-        if (newDirection === 1) {
-          return (prev + 1) % images.length;
-        }
-        return (prev - 1 + images.length) % images.length;
+        const next = prev + step;
+        if (next < 0) return images.length - 1;
+        if (next >= images.length) return 0;
+        return next;
       });
     },
     [images.length]
   );
 
   const goTo = useCallback((index: number) => {
-    setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-  }, [currentIndex]);
-
-  const variants = {
-    enter: () => ({
-      opacity: 0,
-      scale: 1.05,
-    }),
-    center: {
-      opacity: 1,
-      scale: 1,
-    },
-    exit: () => ({
-      opacity: 0,
-      scale: 0.95,
-    }),
-  };
+  }, []);
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      <AnimatePresence initial={false} custom={direction}>
+      {/* 轮播图片 */}
+      <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
-          custom={direction}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={{
             opacity: { duration: 0.8, ease: "easeInOut" },
             scale: { duration: 0.8, ease: "easeInOut" },

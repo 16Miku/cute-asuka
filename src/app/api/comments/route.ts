@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
-type Comment = {
-  user: string;
-  body: string;
-  createdAt: string;
-};
+export const dynamic = "force-static";
 
-const commentStore = new Map<string, Comment[]>();
-
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const imageId = searchParams.get("imageId") || "";
-  const comments = commentStore.get(imageId) || [];
+  const comments = (globalThis as any).__comments?.get(imageId) || [];
   return NextResponse.json({ comments });
 }
 
@@ -24,14 +17,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const saved = commentStore.get(imageId) || [];
+    if (!(globalThis as any).__comments) {
+      (globalThis as any).__comments = new Map();
+    }
+
+    const saved = (globalThis as any).__comments.get(imageId) || [];
     const newEntry = {
       user: typeof user === "string" && user.trim() ? user.trim() : "匿名",
       body: String(content),
       createdAt: new Date().toISOString(),
     };
     saved.push(newEntry);
-    commentStore.set(imageId, saved);
+    (globalThis as any).__comments.set(imageId, saved);
 
     return NextResponse.json({ comments: saved });
   } catch (error) {

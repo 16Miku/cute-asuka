@@ -1,8 +1,5 @@
-"use client";
-
-import { use } from "react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import CommentBoard from "@/components/CommentBoard";
 import Link from "next/link";
@@ -14,8 +11,7 @@ const items = [
     src: "/images/gallery-1.jpg",
     tags: ["经典", "静态"],
     date: "2026-01-01",
-    description:
-      "最经典的元气微笑，永远是心里的白月光。",
+    description: "最经典的元气微笑，永远是心里的白月光。",
   },
   {
     id: 2,
@@ -23,8 +19,7 @@ const items = [
     src: "/images/gallery-2.jpg",
     tags: ["经典", "静态"],
     date: "2026-02-15",
-    description:
-      "可爱到溢出来，让人想立刻保存。",
+    description: "可爱到溢出来，让人想立刻保存。",
   },
   {
     id: 3,
@@ -32,8 +27,7 @@ const items = [
     src: "/images/gallery-3.jpg",
     tags: ["动态", "公会"],
     date: "2026-03-10",
-    description:
-      "一个 wink 把周围空气变成粉红色。",
+    description: "一个 wink 把周围空气变成粉红色。",
   },
   {
     id: 4,
@@ -41,8 +35,7 @@ const items = [
     src: "/images/gallery-4.jpg",
     tags: ["舞台", "演唱会"],
     date: "2026-04-05",
-    description:
-      "聚光灯下的定格，温柔而坚定。",
+    description: "聚光灯下的定格，温柔而坚定。",
   },
   {
     id: 5,
@@ -50,8 +43,7 @@ const items = [
     src: "/images/gallery-5.jpg",
     tags: ["后台", "生活"],
     date: "2026-05-20",
-    description:
-      "卸下妆容后的放松表情，最真实的可爱。",
+    description: "卸下妆容后的放松表情，最真实的可爱。",
   },
   {
     id: 6,
@@ -59,17 +51,20 @@ const items = [
     src: "/images/gallery-6.jpg",
     tags: ["综艺", "搞笑"],
     date: "2026-06-01",
-    description:
-      "综艺里自然冒出的梗，成了粉丝们的圣经。",
+    description: "综艺里自然冒出的梗，成了粉丝们的圣经。",
   },
 ];
+
+export function generateStaticParams() {
+  return items.map((item) => ({ id: String(item.id) }));
+}
 
 export default function GalleryDetail({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = use(params);
+  const id = params.id;
   const item = items.find((it) => it.id === Number(id));
 
   if (!item) return notFound();
@@ -137,9 +132,11 @@ export default function GalleryDetail({
             <button
               className="rounded-full border border-border px-3 py-1.5 text-xs"
               onClick={() => {
-                navigator.clipboard.writeText(
-                  `${window.location.origin}/gallery/${item.id}`
-                );
+                if (typeof window !== "undefined") {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/gallery/${item.id}`
+                  );
+                }
               }}
             >
               复制分享链接

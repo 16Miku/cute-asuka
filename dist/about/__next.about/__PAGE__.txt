@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[74888,["/_next/static/chunks/0fnvxagr-867t.js","/_next/static/chunks/2b69pih66o-w1.js","/_next/static/chunks/3v9fyqbzrbcip.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"mx-auto max-w-3xl px-4 py-16","children":[["$","h1",null,{"className":"text-3xl font-bold tracking-wider","children":"ABOUT"}],["$","div",null,{"className":"mt-8 space-y-5 text-sm leading-relaxed text-muted-foreground","children":[["$","p",null,{"children":"这是一个由粉丝搭建的小小表情包站点，献给斋藤飞鸟。"}],["$","p",null,{"children":"设计采用乃木坂风格：干净、克制、克制中透露出小小重音。 让每一张表情包都成为随时可用的治愈瞬间。"}],["$","p",null,{"children":"网站功能仍在陆续完善中，后续将加入分类筛选、下载、收藏等。"}],["$","p",null,{"children":"如有问题或建议，欢迎联系。"}]]}]]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"Jh0NKEcrJThk7noh6ZKcy"}
+4:null
