@@ -7,12 +7,6 @@ import { useState, useEffect } from "react";
 
 type Feature = { title: string; desc: string; href: string; cover: string };
 
-const stats = [
-  { label: "GIF 动态表情", value: "111+" },
-  { label: "高清静态图", value: "71+" },
-  { label: "总计表情包", value: "205+" },
-];
-
 const features: Feature[] = [
   {
     title: "Gallery",
@@ -35,32 +29,61 @@ const features: Feature[] = [
 ];
 
 export default function Home() {
-  const [ready, setReady] = useState(false);
-  const [highlight, setHighlight] = useState<string | null>(null);
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  const [stats, setStats] = useState([
+    { label: "GIF 动态表情", value: "—" },
+    { label: "高清静态图", value: "—" },
+    { label: "总计表情包", value: "—" },
+  ]);
 
   useEffect(() => {
-    setReady(true);
+    fetch("/api/images", { cache: "no-store" })
+      .then((res) => (res.ok ? (res.json() as Promise<string[]>) : []))
+      .then((files) => {
+        if (!files.length) {
+          setStats([
+            { label: "GIF 动态表情", value: "0" },
+            { label: "高清静态图", value: "0" },
+            { label: "总计表情包", value: "0" },
+          ]);
+          return;
+        }
+        const gifCount = files.filter((f) =>
+          f.toLowerCase().endsWith(".gif")
+        ).length;
+        const staticCount = files.length - gifCount;
+        setStats([
+          { label: "GIF 动态表情", value: `${gifCount}+` },
+          { label: "高清静态图", value: `${staticCount}+` },
+          { label: "总计表情包", value: `${files.length}+` },
+        ]);
+      })
+      .catch(() => {
+        // 保持占位符不变
+      });
   }, []);
 
   return (
     <div className="relative min-h-screen">
+      {/* Hero 区 */}
       <section className="relative overflow-hidden rounded-b-[2.5rem]">
         <div className="absolute inset-0">
-          {highlight && (
-            <Image
-              src={highlight}
-              alt="hero"
-              fill
-              priority
-              className="object-cover object-center"
-            />
-          )}
+          <Image
+            src={features[0].cover}
+            alt="Cute Asuka 主页背景"
+            fill
+            priority
+            className={`object-cover object-center transition-opacity duration-700 ${
+              heroLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setHeroLoaded(true)}
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
         </div>
         <div className="relative mx-auto max-w-6xl px-4 py-28 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-4xl font-bold tracking-widest text-white md:text-6xl"
           >
@@ -68,7 +91,7 @@ export default function Home() {
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/90 md:text-base"
           >
@@ -77,7 +100,7 @@ export default function Home() {
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
             className="mt-8 flex flex-wrap items-center justify-center gap-4"
           >
@@ -94,6 +117,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Features 卡片区 */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-3">
           {features.map((item, idx) => (
@@ -108,6 +132,11 @@ export default function Home() {
                   alt={item.title}
                   fill
                   className="object-cover transition duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    // 图片加载失败时隐藏，显示背景色
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-3 left-4 rounded-full border border-white/40 bg-white/10 px-3 py-1 text-[10px] tracking-widest text-white backdrop-blur">

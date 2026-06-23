@@ -32,9 +32,6 @@
   --accent: #e48aa6;
   --akane: #ffb3c6;
   --akane-foreground: #4a2a36;
-
-  --font-geist-sans: var(--font-sans), ui-sans-serif, system-ui, "Hiragino Sans", "Noto Sans SC", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-geist-mono: var(--font-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 .dark {
