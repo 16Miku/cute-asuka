@@ -96,8 +96,8 @@ export default function HeroCarousel({
         </motion.div>
       </AnimatePresence>
 
-      {/* 渐变遮罩 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+      {/* 渐变遮罩 - 已调轻，确保图片清晰可见 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/15" />
 
       {/* 左右箭头 */}
       {showArrows && images.length > 1 && (

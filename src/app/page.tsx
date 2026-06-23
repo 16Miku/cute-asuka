@@ -93,8 +93,8 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Hero 区 */}
-      <section className="relative h-[70vh] overflow-hidden rounded-b-[2.5rem]">
+      {/* Hero 区 - 高度从 85vh 调整为 92vh，确保桌面端图片完整显示 */}
+      <section className="relative h-[92vh] min-h-[600px] overflow-hidden rounded-b-[2.5rem]">
         <HeroCarousel
           mobileImages={mobileHeroImages}
           desktopImages={desktopHeroImages}
