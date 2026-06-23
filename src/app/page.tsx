@@ -3,38 +3,57 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
-const heroImages = [
-  "/images/hero-1.jpg",
-  "/images/hero-2.jpg",
-  "/images/hero-3.jpg",
+const stats = [
+  { label: "GIF 动态表情", value: "111+" },
+  { label: "高清静态图", value: "71+" },
+  { label: "总计表情包", value: "205+" },
 ];
 
-const highlights = [
-  { label: "表情包画廊", href: "/gallery", desc: "可爱静态 / 动态一网打尽" },
-  { label: "每日表情", href: "/daily", desc: "每天一张随机惊喜" },
-  { label: "关于项目", href: "/about", desc: "喜欢的力量与分享的快乐" },
+const features = [
+  {
+    title: "Gallery",
+    desc: "浏览所有表情包，支持按静态 / 动态分类，一键预览与下载。",
+    href: "/gallery",
+  },
+  {
+    title: "Daily",
+    desc: "每天随机推出一张治愈系表情，给你的日常加点糖。",
+    href: "/daily",
+  },
+  {
+    title: "About",
+    desc: "了解站点的设计理念：乃木坂风格，干净、克制、温柔。",
+    href: "/about",
+  },
 ];
 
 export default function Home() {
+  const [ready, setReady] = useState(false);
+  const [highlight, setHighlight] = useState("/images/0D4291F4BA750219AD4B85B438B8966E.jpg");
+
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
   return (
     <div className="relative min-h-screen">
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden rounded-b-[2rem]">
         <div className="absolute inset-0">
           <Image
-            src="/images/hero-cover.jpg"
-            alt="cover"
+            src={highlight}
+            alt="hero"
             fill
             priority
-            className="object-cover object-center opacity-70"
+            className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-black/30 dark:bg-black/50" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
         </div>
-        <div className="relative mx-auto max-w-6xl px-4 py-32 text-center">
+        <div className="relative mx-auto max-w-6xl px-4 py-28 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
             transition={{ duration: 0.6 }}
             className="text-4xl font-bold tracking-widest text-white md:text-6xl"
           >
@@ -42,7 +61,7 @@ export default function Home() {
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/90 md:text-base"
           >
@@ -51,17 +70,17 @@ export default function Home() {
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 15 }}
             transition={{ delay: 0.4, duration: 0.6 }}
             className="mt-8 flex flex-wrap items-center justify-center gap-4"
           >
-            {highlights.map((item) => (
+            {features.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm tracking-widest text-white backdrop-blur transition hover:bg-white/20"
               >
-                {item.label}
+                {item.title}
               </Link>
             ))}
           </motion.div>
@@ -70,22 +89,32 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="grid gap-6 md:grid-cols-3">
-          {highlights.map((item) => (
+          {features.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-md"
             >
-              <div className="aspect-[4/3] w-full bg-muted" />
+              <div className="aspect-[4/3] w-full bg-gradient-to-br from-pink-50 to-rose-100 dark:from-zinc-800 dark:to-zinc-900" />
               <div className="p-5">
-                <h3 className="text-base font-semibold tracking-wide">
-                  {item.label}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {item.desc}
-                </p>
+                <h3 className="text-base font-semibold tracking-wide">{item.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{item.desc}</p>
               </div>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="grid gap-6 sm:grid-cols-3">
+          {stats.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-border bg-card p-6 text-center"
+            >
+              <p className="text-3xl font-bold tracking-wide">{item.value}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{item.label}</p>
+            </div>
           ))}
         </div>
       </section>

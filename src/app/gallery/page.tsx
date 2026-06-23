@@ -6,21 +6,11 @@ import Image from "next/image";
 
 type Item = { id: number; title: string; cat: string; src: string };
 
-const categories = ["ALL", "经典", "动态", "舞台", "综艺", "后台"];
-
-const catPool = ["经典", "动态", "舞台", "综艺", "后台"];
-const titlePool = [
-  "元气微笑",
-  "cuteness overload",
-  "害羞 wink",
-  "舞台定格",
-  "后台絮语",
-  "综艺梗图",
-];
+const categories = ["所有表情包", "静态表情包", "动态表情包"];
 
 export default function Gallery() {
   const [items, setItems] = useState<Item[]>([]);
-  const [active, setActive] = useState("ALL");
+  const [active, setActive] = useState("所有表情包");
   const [selected, setSelected] = useState<Item | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -41,12 +31,18 @@ export default function Gallery() {
           return;
         }
         setItems(
-          files.map((file, index) => ({
-            id: index + 1,
-            title: titlePool[index % titlePool.length],
-            cat: catPool[index % catPool.length],
-            src: base + file,
-          }))
+          files.map((file, index) => {
+            const ext = file.split('.').pop()?.toLowerCase() || '';
+            const isStatic = ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
+            const isDynamic = ['gif'].includes(ext);
+            const cat = isStatic ? "静态表情包" : (isDynamic ? "动态表情包" : "静态表情包");
+            return {
+              id: index + 1,
+              title: getTitle(file),
+              cat,
+              src: base + file,
+            };
+          })
         );
       })
       .catch(() => {
@@ -56,8 +52,18 @@ export default function Gallery() {
       .finally(() => setLoading(false));
   }, []);
 
+  function getTitle(file: string): string {
+    const name = file.replace(/\.[^/.]+$/, "");
+    if (name.startsWith("QQ") || name.startsWith("QQ截图")) return "收藏截图";
+    if (name.startsWith("Snipaste")) return "精选截图";
+    if (name.startsWith("{") && name.endsWith("}")) return "动态特写";
+    if (/^\d+$/.test(name.substring(0, 8))) return name.substring(0, 8) + "…";
+    if (name.length > 12) return name.substring(0, 12) + "…";
+    return name || "表情包";
+  }
+
   const filtered =
-    active === "ALL" ? items : items.filter((i) => i.cat === active);
+    active === "所有表情包" ? items : items.filter((i) => i.cat === active);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16">
@@ -96,16 +102,32 @@ export default function Gallery() {
               setLoadError(null);
               fetch("/api/images", { cache: "no-store" })
                 .then((res) => res.json() as Promise<string[]>)
-                .then((files) =>
+                .then((files) => {
+                  if (files.length === 0) {
+                    setItems([]);
+                    return;
+                  }
                   setItems(
-                    files.map((file, index) => ({
-                      id: index + 1,
-                      title: titlePool[index % titlePool.length],
-                      cat: catPool[index % catPool.length],
-                      src: `/images/${file}`,
-                    }))
-                  )
-                )
+                    files.map((file, index) => {
+                      const ext = file.split(".").pop()?.toLowerCase() || "";
+                      const isStatic = ["jpg", "jpeg", "png", "webp"].includes(
+                        ext
+                      );
+                      const isDynamic = ["gif"].includes(ext);
+                      const cat = isStatic
+                        ? "静态表情包"
+                        : isDynamic
+                        ? "动态表情包"
+                        : "静态表情包";
+                      return {
+                        id: index + 1,
+                        title: getTitle(file),
+                        cat,
+                        src: `/images/${file}`,
+                      };
+                    })
+                  );
+                })
                 .catch(() => setLoadError("加载图片失败，请稍后重试"))
                 .finally(() => setLoading(false));
             }}
