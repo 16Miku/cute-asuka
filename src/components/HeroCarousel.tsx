@@ -5,19 +5,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 interface CarouselProps {
-  images: string[];
+  mobileImages: string[];
+  desktopImages: string[];
   interval?: number;
   showDots?: boolean;
   showArrows?: boolean;
 }
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    setMatches(media.matches);
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, [query]);
+
+  return matches;
+}
+
 export default function HeroCarousel({
-  images,
+  mobileImages,
+  desktopImages,
   interval = 5000,
   showDots = true,
   showArrows = true,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  // 根据设备类型选择图片组
+  const images = isDesktop ? desktopImages : mobileImages;
+
+  // 当设备切换时，重置到第一张
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [isDesktop]);
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -43,12 +68,14 @@ export default function HeroCarousel({
     setCurrentIndex(index);
   }, []);
 
+  const currentImage = images[currentIndex] || "/images/placeholder.jpg";
+
   return (
     <div className="relative h-full w-full overflow-hidden">
       {/* 轮播图片 */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentIndex}
+          key={`${isDesktop ? "desktop" : "mobile"}-${currentIndex}`}
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -59,7 +86,7 @@ export default function HeroCarousel({
           className="absolute inset-0"
         >
           <Image
-            src={images[currentIndex]}
+            src={currentImage}
             alt={`轮播图 ${currentIndex + 1}`}
             fill
             priority

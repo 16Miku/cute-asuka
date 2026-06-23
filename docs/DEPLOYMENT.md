@@ -25,7 +25,14 @@
 - CommentBoard 增加空状态、加载状态、错误提示
 - 移除 Edge API（`api/health`），避免静态导出冲突
 
-### 问题 4：静态导出配置
+### 问题 4：横幅展示目前响应式切换
+**优化**: 桌面端和移动端展示不同的轮播图素材
+- `public/sp-banner/`：移动端专用竖屏素材（8张）
+- `public/web-banner/`：桌面端专用横屏素材（11张）
+- `HeroCarousel.tsx` 增加 `useMediaQuery` Hook 自动切换
+- 保证不同设备的展示效果最佳
+
+### 问题 5：静态导出配置
 **配置** (`next.config.ts`):
 ```typescript
 const nextConfig: NextConfig = {
@@ -102,14 +109,16 @@ CDN (Render Static Site 自带)
 1. **大文件处理**: 及时清理，避免仓库污染
 2. **静态导出 vs 运行时**: 展示类项目优先 Static Site
 3. **API 设计**: 静态导出下 API 只能作为数据快照
+4. **响应式素材**: 不同设备使用不同比例的图片素材，获得最佳展示效果
 
 ### 最佳实践
 - 图片、视频等大文件使用 CDN 或外部存储
 - 使用 `force-static` 明确标记静态 API
 - 提交前务必运行 `npm run build` 验证
 - 保留 `generateStaticParams()` 签名供动态路由使用
+- 桌面端/移动端分别准备素材，通过 `useMediaQuery` 动态切换
 
 ---
 
 **记录日期**: 2025-06-24
-**项目版本**: v1.1
+**项目版本**: v1.2

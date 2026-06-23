@@ -29,12 +29,31 @@ const features: Feature[] = [
   },
 ];
 
-const heroImages = [
-  "/images/1EE7B161F569BD20637D529E37840F1D.jpg",
-  "/images/0D4291F4BA750219AD4B85B438B8966E.jpg",
-  "/images/0D80C53FF8683DFAA86487E7E93CC263.jpg",
-  "/images/B3417AB97E1264E21F083680EA7A7F48.jpg",
-  "/images/46108C12DFB9EF0FDF1D9DE2CEC42D02.jpg",
+// 移动端轮播图素材 (sp-banner)
+const mobileHeroImages = [
+  "/sp-banner/007db78fly1habodixk36j30u00u00x1.jpg",
+  "/sp-banner/35D4810AA84C785CEC9845663F8FF042.jpg",
+  "/sp-banner/3f99-hrpcmqv4220798.jpg",
+  "/sp-banner/6de29fd509fd96609bf8f221e8c32.jpg",
+  "/sp-banner/Asuka_Yoda.jpg",
+  "/sp-banner/C26EF8FC1ECDD3E91FC1B7FE5475FF04.jpg",
+  "/sp-banner/R-C.jpg",
+  "/sp-banner/asuka-wife.png",
+];
+
+// 桌面端轮播图素材 (web-banner)
+const desktopHeroImages = [
+  "/web-banner/17112eadc50604486b3820457cecc.jpg",
+  "/web-banner/627FF46985455460C877ECF82452CEB7.jpg",
+  "/web-banner/bc2d0c405d17e3855fbc79ce58571.jpg",
+  "/web-banner/cc1133995ab8c56ba2a2bab389780.jpg",
+  "/web-banner/d979c5942b49a9e960ce675526c89.jpg",
+  "/web-banner/db9be99fc30b2aa0aa7fae7207a0b.jpg",
+  "/web-banner/官网图1.jpg",
+  "/web-banner/官网图2.jpg",
+  "/web-banner/官网图3.jpg",
+  "/web-banner/官网图4.jpg",
+  "/web-banner/官网图5.jpg",
 ];
 
 export default function Home() {
@@ -76,7 +95,11 @@ export default function Home() {
     <div className="relative min-h-screen">
       {/* Hero 区 */}
       <section className="relative h-[70vh] overflow-hidden rounded-b-[2.5rem]">
-        <HeroCarousel images={heroImages} interval={6000} />
+        <HeroCarousel
+          mobileImages={mobileHeroImages}
+          desktopImages={desktopHeroImages}
+          interval={6000}
+        />
         <div className="relative mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
