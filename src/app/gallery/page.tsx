@@ -1,23 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
+type Item = { id: number; title: string; cat: string; src: string };
+
 const categories = ["ALL", "经典", "动态", "舞台", "综艺", "后台"];
 
-const items = [
-  { id: 1, title: "元气微笑", cat: "经典", src: "/images/gallery-1.jpg" },
-  { id: 2, title: "cuteness overload", cat: "经典", src: "/images/gallery-2.jpg" },
-  { id: 3, title: "害羞 wink", cat: "动态", src: "/images/gallery-3.jpg" },
-  { id: 4, title: "舞台定格", cat: "舞台", src: "/images/gallery-4.jpg" },
-  { id: 5, title: "后台絮语", cat: "后台", src: "/images/gallery-5.jpg" },
-  { id: 6, title: "综艺梗图", cat: "综艺", src: "/images/gallery-6.jpg" },
+const catPool = ["经典", "动态", "舞台", "综艺", "后台"];
+const titlePool = [
+  "元气微笑",
+  "cuteness overload",
+  "害羞 wink",
+  "舞台定格",
+  "后台絮语",
+  "综艺梗图",
 ];
 
 export default function Gallery() {
+  const [items, setItems] = useState<Item[]>([]);
   const [active, setActive] = useState("ALL");
-  const [selected, setSelected] = useState<(typeof items)[number] | null>(null);
+  const [selected, setSelected] = useState<Item | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const base = "/images/";
+    setLoading(true);
+    setLoadError(null);
+    fetch("/api/images", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("无法加载图片列表");
+        return res.json() as Promise<string[]>;
+      })
+      .then((files) => {
+        if (files.length === 0) {
+          setItems([]);
+          return;
+        }
+        setItems(
+          files.map((file, index) => ({
+            id: index + 1,
+            title: titlePool[index % titlePool.length],
+            cat: catPool[index % catPool.length],
+            src: base + file,
+          }))
+        );
+      })
+      .catch(() => {
+        setLoadError("加载图片失败，请稍后重试");
+        setItems([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered =
     active === "ALL" ? items : items.filter((i) => i.cat === active);
@@ -49,30 +86,79 @@ export default function Gallery() {
         </div>
       </div>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {filtered.map((item) => (
-          <motion.button
-            key={item.id}
-            layout
-            whileHover={{ scale: 1.02 }}
-            onClick={() => setSelected(item)}
-            className="group overflow-hidden rounded-2xl border border-border bg-card text-left"
+      {loadError ? (
+        <div className="mt-10 rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          {loadError}
+          <button
+            type="button"
+            onClick={() => {
+              setLoading(true);
+              setLoadError(null);
+              fetch("/api/images", { cache: "no-store" })
+                .then((res) => res.json() as Promise<string[]>)
+                .then((files) =>
+                  setItems(
+                    files.map((file, index) => ({
+                      id: index + 1,
+                      title: titlePool[index % titlePool.length],
+                      cat: catPool[index % catPool.length],
+                      src: `/images/${file}`,
+                    }))
+                  )
+                )
+                .catch(() => setLoadError("加载图片失败，请稍后重试"))
+                .finally(() => setLoading(false));
+            }}
+            className="mt-4 rounded-full border border-border px-4 py-2 text-xs hover:border-accent"
           >
-            <div className="relative aspect-square w-full bg-muted">
-              <Image
-                src={item.src}
-                alt={item.title}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-110"
-              />
+            重试
+          </button>
+        </div>
+      ) : loading ? (
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="overflow-hidden rounded-2xl border border-border bg-card"
+            >
+              <div className="aspect-square w-full animate-pulse bg-muted" />
+              <div className="space-y-2 p-4">
+                <div className="h-4 w-2/3 rounded bg-muted" />
+                <div className="h-3 w-1/3 rounded bg-muted" />
+              </div>
             </div>
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm font-medium">{item.title}</span>
-              <span className="text-xs text-muted-foreground">{item.cat}</span>
-            </div>
-          </motion.button>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          暂无图片，请先放入 public/images
+        </div>
+      ) : (
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {filtered.map((item) => (
+            <motion.button
+              key={item.id}
+              layout
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setSelected(item)}
+              className="group overflow-hidden rounded-2xl border border-border bg-card text-left"
+            >
+              <div className="relative aspect-square w-full bg-muted">
+                <Image
+                  src={item.src}
+                  alt={item.title}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-110"
+                />
+              </div>
+              <div className="flex items-center justify-between px-4 py-3">
+                <span className="text-sm font-medium">{item.title}</span>
+                <span className="text-xs text-muted-foreground">{item.cat}</span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {selected && (
