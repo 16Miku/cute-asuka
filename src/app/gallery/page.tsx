@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -16,7 +16,16 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // ESC鍵關閉 Lightbox
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const fetchImages = useCallback(() => {
     const base = "/images/";
     setLoading(true);
     setLoadError(null);
@@ -32,10 +41,14 @@ export default function Gallery() {
         }
         setItems(
           files.map((file, index) => {
-            const ext = file.split('.').pop()?.toLowerCase() || '';
-            const isStatic = ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
-            const isDynamic = ['gif'].includes(ext);
-            const cat = isStatic ? "静态表情包" : (isDynamic ? "动态表情包" : "静态表情包");
+            const ext = file.split(".").pop()?.toLowerCase() || "";
+            const isStatic = ["jpg", "jpeg", "png", "webp"].includes(ext);
+            const isDynamic = ["gif"].includes(ext);
+            const cat = isStatic
+              ? "静态表情包"
+              : isDynamic
+              ? "动态表情包"
+              : "静态表情包";
             return {
               id: index + 1,
               title: getTitle(file),
@@ -51,6 +64,10 @@ export default function Gallery() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchImages();
+  }, [fetchImages]);
 
   function getTitle(file: string): string {
     const name = file.replace(/\.[^/.]+$/, "");
@@ -97,40 +114,7 @@ export default function Gallery() {
           {loadError}
           <button
             type="button"
-            onClick={() => {
-              setLoading(true);
-              setLoadError(null);
-              fetch("/api/images", { cache: "no-store" })
-                .then((res) => res.json() as Promise<string[]>)
-                .then((files) => {
-                  if (files.length === 0) {
-                    setItems([]);
-                    return;
-                  }
-                  setItems(
-                    files.map((file, index) => {
-                      const ext = file.split(".").pop()?.toLowerCase() || "";
-                      const isStatic = ["jpg", "jpeg", "png", "webp"].includes(
-                        ext
-                      );
-                      const isDynamic = ["gif"].includes(ext);
-                      const cat = isStatic
-                        ? "静态表情包"
-                        : isDynamic
-                        ? "动态表情包"
-                        : "静态表情包";
-                      return {
-                        id: index + 1,
-                        title: getTitle(file),
-                        cat,
-                        src: `/images/${file}`,
-                      };
-                    })
-                  );
-                })
-                .catch(() => setLoadError("加载图片失败，请稍后重试"))
-                .finally(() => setLoading(false));
-            }}
+            onClick={fetchImages}
             className="mt-4 rounded-full border border-border px-4 py-2 text-xs hover:border-accent"
           >
             重试
@@ -171,11 +155,15 @@ export default function Gallery() {
                   alt={item.title}
                   fill
                   className="object-cover transition duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  loading="lazy"
                 />
               </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <span className="text-sm font-medium">{item.title}</span>
-                <span className="text-xs text-muted-foreground">{item.cat}</span>
+                <span className="text-xs text-muted-foreground">
+                  {item.cat}
+                </span>
               </div>
             </motion.button>
           ))}
@@ -204,6 +192,7 @@ export default function Gallery() {
                 width={1200}
                 height={1200}
                 className="max-h-[85vh] w-auto object-contain"
+                priority
               />
               <div className="absolute bottom-0 inset-x-0 flex items-center justify-between bg-gradient-to-t from-black/60 to-transparent px-5 py-4 text-white">
                 <div>
@@ -211,7 +200,7 @@ export default function Gallery() {
                   <p className="text-xs opacity-80">{selected.cat}</p>
                 </div>
                 <button
-                  className="rounded-full border border-white/60 bg-white/10 px-4 py-1.5 text-xs backdrop-blur"
+                  className="rounded-full border border-white/60 bg-white/10 px-4 py-1.5 text-xs backdrop-blur transition hover:bg-white/20"
                   onClick={() => {
                     const a = document.createElement("a");
                     a.href = selected.src;

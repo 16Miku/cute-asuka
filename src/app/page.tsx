@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import HeroCarousel from "@/components/HeroCarousel";
 
 type Feature = { title: string; desc: string; href: string; cover: string };
 
@@ -26,6 +27,14 @@ const features: Feature[] = [
     href: "/about",
     cover: "/images/0D80C53FF8683DFAA86487E7E93CC263.jpg",
   },
+];
+
+const heroImages = [
+  "/images/1EE7B161F569BD20637D529E37840F1D.jpg",
+  "/images/0D4291F4BA750219AD4B85B438B8966E.jpg",
+  "/images/0D80C53FF8683DFAA86487E7E93CC263.jpg",
+  "/images/B3417AB97E1264E21F083680EA7A7F48.jpg",
+  "/images/46108C12DFB9EF0FDF1D9DE2CEC42D02.jpg",
 ];
 
 export default function Home() {
@@ -66,21 +75,9 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
       {/* Hero 区 */}
-      <section className="relative overflow-hidden rounded-b-[2.5rem]">
-        <div className="absolute inset-0">
-          <Image
-            src={features[0].cover}
-            alt="Cute Asuka 主页背景"
-            fill
-            priority
-            className={`object-cover object-center transition-opacity duration-700 ${
-              heroLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            onLoad={() => setHeroLoaded(true)}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-4 py-28 text-center">
+      <section className="relative h-[70vh] overflow-hidden rounded-b-[2.5rem]">
+        <HeroCarousel images={heroImages} interval={6000} />
+        <div className="relative mx-auto flex h-full max-w-6xl flex-col items-center justify-center px-4 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}

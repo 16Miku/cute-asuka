@@ -13,14 +13,22 @@ export default function CommentBoard({ imageId }: { imageId: number }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [body, setBody] = useState("");
   const [user, setUser] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = async () => {
-    const res = await fetch(
-      `/api/comments?imageId=${encodeURIComponent(String(imageId))}`,
-      { cache: "no-store" }
-    );
-    const data = await res.json();
-    setComments(data.comments || []);
+    try {
+      const res = await fetch(
+        `/api/comments?imageId=${encodeURIComponent(String(imageId))}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error("加载评论失败");
+      const data = await res.json();
+      setComments(data.comments || []);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "加载评论失败");
+    }
   };
 
   useEffect(() => {
@@ -29,14 +37,28 @@ export default function CommentBoard({ imageId }: { imageId: number }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!body) return;
-    await fetch(`/api/comments?imageId=${imageId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user, content: body }),
-    });
-    setBody("");
-    refresh();
+    if (!body.trim()) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/comments?imageId=${imageId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageId,
+          user: user.trim() || "匿名",
+          content: body.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error("提交失败");
+      setBody("");
+      setUser("");
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "提交失败");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,22 +71,35 @@ export default function CommentBoard({ imageId }: { imageId: number }) {
           placeholder="昵称（选填）"
           value={user}
           onChange={(e) => setUser(e.target.value)}
+          maxLength={20}
         />
         <input
           className="rounded-full border border-border bg-background px-3 py-2 text-sm"
           placeholder="留下喜欢"
           value={body}
           onChange={(e) => setBody(e.target.value)}
+          maxLength={200}
+          required
         />
         <button
           type="submit"
-          className="rounded-full bg-accent px-4 py-2 text-xs text-akane-foreground"
+          disabled={isSubmitting}
+          className="rounded-full bg-accent px-4 py-2 text-xs text-akane-foreground transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          发送
+          {isSubmitting ? "发送中..." : "发送"}
         </button>
       </form>
 
+      {error && (
+        <p className="mt-2 text-xs text-red-500">{error}</p>
+      )}
+
       <div className="mt-4 space-y-3">
+        {comments.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground py-4">
+            暂无评论，来抢沙发吧~ ✨
+          </p>
+        )}
         {comments.map((item, idx) => (
           <motion.div
             key={idx}

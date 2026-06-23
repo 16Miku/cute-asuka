@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -18,6 +18,20 @@ interface ImageGridProps {
 
 export default function ImageGrid({ items }: ImageGridProps) {
   const [selected, setSelected] = useState<Item | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+  const handleImageLoad = useCallback((id: number) => {
+    setLoadedImages((prev) => new Set(prev).add(id));
+  }, []);
+
+  // ESC 鍵关闭 Lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
@@ -39,6 +53,10 @@ export default function ImageGrid({ items }: ImageGridProps) {
                 alt={item.title}
                 fill
                 className="object-cover transition duration-500 group-hover:scale-110"
+                onLoad={() => handleImageLoad(item.id)}
+                onError={() => handleImageLoad(item.id)}
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                loading="lazy"
               />
             </motion.div>
             <div className="p-3">
@@ -79,6 +97,8 @@ export default function ImageGrid({ items }: ImageGridProps) {
                   alt={selected.title}
                   fill
                   className="object-contain"
+                  sizes="(max-width: 1280px) 100vw, 1280px"
+                  priority
                 />
               </div>
               <div className="flex items-center justify-between p-4">
@@ -88,7 +108,7 @@ export default function ImageGrid({ items }: ImageGridProps) {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="rounded-full border border-border px-3 py-1.5 text-xs"
+                    className="rounded-full border border-border px-3 py-1.5 text-xs transition hover:bg-muted"
                     onClick={() => {
                       navigator.clipboard.writeText(
                         `${window.location.origin}/gallery/${selected.id}`
@@ -100,7 +120,7 @@ export default function ImageGrid({ items }: ImageGridProps) {
                   <a
                     href={selected.src}
                     download
-                    className="rounded-full bg-accent px-3 py-1.5 text-xs text-akane-foreground"
+                    className="rounded-full bg-accent px-3 py-1.5 text-xs text-akane-foreground transition hover:brightness-110"
                   >
                     下载原图
                   </a>
