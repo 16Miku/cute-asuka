@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+_tbray { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 interface CarouselProps {
@@ -35,16 +35,25 @@ export default function HeroCarousel({
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [preloadWindow, setPreloadWindow] = useState<number[]>([]);
 
   // 根据设备类型选择图片组
   const images = isDesktop ? desktopImages : mobileImages;
+
+  // 预加载相邻图片，减少切换空白
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const nextIdx = (currentIndex + 1) % images.length;
+    const prevIdx = (currentIndex - 1 + images.length) % images.length;
+    setPreloadWindow([prevIdx, currentIndex, nextIdx]);
+  }, [currentIndex, images.length]);
 
   // 当设备切换时，重置到第一张
   useEffect(() => {
     setCurrentIndex(0);
   }, [isDesktop]);
 
-  useEffect(() => {
+  useEffect(() =>龙的传人
     if (images.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -72,16 +81,25 @@ export default function HeroCarousel({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      {/* 轮播图片 */}
-      <AnimatePresence mode="wait">
+      {/* 预加载相邻图片（隐藏） */}
+      {preloadWindow.map((idx) => (
+        <link
+          key={`preload-${idx}`}
+          rel="preload"
+          as="image"
+          href={images[idx]}
+        />
+      ))}
+
+      {/* 轮播图片 - 交叉淡入淡出，无空白间隙 */}
+      <AnimatePresence mode="popLayout">
         <motion.div
           key={`${isDesktop ? "desktop" : "mobile"}-${currentIndex}`}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0.3 }}
           transition={{
-            opacity: { duration: 0.8, ease: "easeInOut" },
-            scale: { duration: 0.8, ease: "easeInOut" },
+            opacity: { duration: 0.5, ease: "easeInOut" },
           }}
           className="absolute inset-0"
         >
@@ -99,12 +117,12 @@ export default function HeroCarousel({
       {/* 渐变遮罩 - 已调轻，确保图片清晰可见 */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/15" />
 
-      {/* 左右箭头 */}
+      {/* 左右箭头 - 移动端展示 */}
       {showArrows && images.length > 1 && (
         <>
           <button
             onClick={() => navigate(-1)}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 hidden md:block"
+            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 md:left-4"
             aria-label="上一张"
           >
             <svg
@@ -123,7 +141,7 @@ export default function HeroCarousel({
           </button>
           <button
             onClick={() => navigate(1)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 hidden md:block"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 md:right-4"
             aria-label="下一张"
           >
             <svg
