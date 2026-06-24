@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-_tbray { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 interface CarouselProps {
@@ -53,7 +53,7 @@ export default function HeroCarousel({
     setCurrentIndex(0);
   }, [isDesktop]);
 
-  useEffect(() =>龙的传人
+  useEffect(() => {
     if (images.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -81,7 +81,7 @@ export default function HeroCarousel({
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      {/* 预加载相邻图片（隐藏） */}
+      {/* 预加载相邻图片（通过 link 标签） */}
       {preloadWindow.map((idx) => (
         <link
           key={`preload-${idx}`}
@@ -117,7 +117,7 @@ export default function HeroCarousel({
       {/* 渐变遮罩 - 已调轻，确保图片清晰可见 */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/15" />
 
-      {/* 左右箭头 - 移动端展示 */}
+      {/* 左右箭头 - 移动端也展示 */}
       {showArrows && images.length > 1 && (
         <>
           <button
