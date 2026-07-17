@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import useTheme from "./useTheme";
 import ThemeToggle from "./ThemeToggle";
 
 const NAV = [
@@ -16,20 +15,27 @@ const NAV = [
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const isHome = pathname === "/";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-40 transition-colors ${
+        isHome
+          ? "border-b border-white/10 bg-background/40 backdrop-blur-xl"
+          : "border-b border-border/60 bg-background/70 backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-lg font-semibold tracking-wide">
+        <Link
+          href="/"
+          className="font-display text-lg font-medium tracking-wide"
+        >
           Cute Asuka
         </Link>
 
         <nav className="hidden gap-8 text-sm md:flex">
           {NAV.map((item) => {
-            const active =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
+            const active = pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} className="relative">
                 <span
@@ -88,7 +94,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden border-t border-border/60 bg-background"
+            className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl"
           >
             <nav className="flex flex-col px-4 py-3">
               {NAV.map((item) => (

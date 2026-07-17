@@ -12,8 +12,14 @@
   --color-akane: var(--akane);
   --color-akane-foreground: var(--akane-foreground);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, "Hiragino Sans", "Noto Sans SC", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: var(--font-sans-body), ui-sans-serif, system-ui, "Hiragino Sans",
+    "Noto Sans SC", "PingFang SC", "Apple Color Emoji", "Segoe UI Emoji";
+  /* Display: system mincho stack — avoids build-time Google Fonts fetch */
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Songti SC",
+    "Hiragino Mincho ProN", "Noto Serif SC", "Source Han Serif SC", Georgia,
+    serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono",
+    Menlo, Consolas, monospace;
 
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
@@ -22,29 +28,39 @@
 }
 
 :root {
-  --background: #fff8fb;
-  --foreground: #2e2a2d;
-  --muted: #fbe9ef;
-  --muted-foreground: #7a6b72;
-  --card: #ffffff;
-  --border: #f3dce5;
+  --background: #fff6f9;
+  --foreground: #2a2327;
+  --muted: #fceef3;
+  --muted-foreground: #7a6570;
+  --card: color-mix(in oklab, #ffffff 88%, #ffe4ec 12%);
+  --border: color-mix(in oklab, #f3dce5 80%, #ffffff 20%);
   --primary: #f7aec3;
-  --accent: #e48aa6;
+  --accent: #d96b8f;
   --akane: #ffb3c6;
   --akane-foreground: #4a2a36;
+  --glass: color-mix(in oklab, #ffffff 55%, transparent);
+  --glass-border: color-mix(in oklab, #ffffff 55%, #f3dce5 45%);
 }
 
 .dark {
-  --background: #181014;
-  --foreground: #f7ecf1;
-  --muted: #23161c;
+  --background: #120d11;
+  --foreground: #f8eef3;
+  --muted: #1c1218;
   --muted-foreground: #b39ba4;
-  --card: #1e141b;
+  --card: color-mix(in oklab, #1a1218 92%, #3a2030 8%);
   --border: #3d2933;
   --primary: #d97a9a;
-  --accent: #b85d7a;
+  --accent: #e08aaa;
   --akane: #c77996;
   --akane-foreground: #ffd5e4;
+  --glass: color-mix(in oklab, #1a1218 55%, transparent);
+  --glass-border: color-mix(in oklab, #ffffff 12%, #3d2933 88%);
+}
+
+@property --angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 @layer base {
@@ -52,9 +68,30 @@
     border-color: var(--border);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 55%, transparent);
+    color: var(--foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--accent) 70%, white);
+    outline-offset: 3px;
   }
 }
 
@@ -63,11 +100,175 @@
     text-wrap: balance;
   }
 
+  .font-display {
+    font-family: var(--font-display);
+    font-feature-settings: "palt" 1;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .glass-panel {
+    border-radius: 1.25rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    box-shadow:
+      0 1px 0 color-mix(in oklab, white 35%, transparent) inset,
+      0 20px 50px -28px color-mix(in oklab, #f43f5e 28%, transparent);
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  }
+
+  .dark .glass-panel {
+    box-shadow:
+      0 1px 0 color-mix(in oklab, white 8%, transparent) inset,
+      0 24px 60px -30px rgb(0 0 0 / 0.55);
+  }
+
+  .btn-glass,
+  .btn-glass-primary,
+  .btn-glass-solid {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    padding: 0.7rem 1.35rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    transition:
+      transform 0.25s ease,
+      background 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .btn-glass {
+    border: 1px solid color-mix(in oklab, white 40%, transparent);
+    background: color-mix(in oklab, white 12%, transparent);
+    color: white;
+    backdrop-filter: blur(12px);
+  }
+
+  .btn-glass:hover {
+    background: color-mix(in oklab, white 22%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .btn-glass-primary {
+    border: 1px solid color-mix(in oklab, white 50%, transparent);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, #fff 88%, #fecdd3),
+      color-mix(in oklab, #fda4af 70%, #f0abfc)
+    );
+    color: #4a2a36;
+    box-shadow: 0 10px 30px -12px rgb(244 114 182 / 0.65);
+  }
+
+  .btn-glass-primary:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+  }
+
+  .btn-glass-solid {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+  }
+
+  .btn-glass-solid:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+  }
+
+  .scroll-chevron {
+    animation: chevron-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes chevron-pulse {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: scaleY(0.7);
+    }
+    50% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+
+  .film-strip {
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 6%,
+      #000 94%,
+      transparent
+    );
+  }
+
+  .film-track {
+    animation: film-scroll var(--film-duration, 48s) linear infinite;
+  }
+
+  .film-track-reverse {
+    animation-name: film-scroll-reverse;
+  }
+
+  @keyframes film-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes film-scroll-reverse {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .film-track,
+    .film-track-reverse,
+    .scroll-chevron {
+      animation: none !important;
+    }
+  }
+
+  /* Scroll-driven fade for supporting elements where supported */
+  @supports (animation-timeline: view()) {
+    .view-fade {
+      animation: view-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+
+    @keyframes view-in {
+      from {
+        opacity: 0.35;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   }
 }

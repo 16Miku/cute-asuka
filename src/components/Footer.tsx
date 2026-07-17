@@ -2,16 +2,22 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-background/60 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-4 py-8 text-center text-xs text-muted-foreground">
-        <p className="mb-2">© {new Date().getFullYear()} Cute Asuka.</p>
-        <p className="mb-3">
-          一个粉丝向表情包小站，内容仅供学习交流使用。
+    <footer className="relative z-10 border-t border-border/60 bg-background/70 backdrop-blur-md">
+      <div className="mx-auto max-w-6xl px-4 py-10 text-center text-xs text-muted-foreground">
+        <p className="font-display text-sm text-foreground/80">Cute Asuka</p>
+        <p className="mt-2">
+          © {new Date().getFullYear()} · 粉丝向表情包小站，内容仅供学习交流
         </p>
-        <div className="flex items-center justify-center gap-6">
-          <Link href="/gallery">GALLERY</Link>
-          <Link href="/daily">DAILY</Link>
-          <Link href="/about">ABOUT</Link>
+        <div className="mt-4 flex items-center justify-center gap-6 tracking-[0.18em]">
+          <Link className="hover:text-foreground" href="/gallery">
+            GALLERY
+          </Link>
+          <Link className="hover:text-foreground" href="/daily">
+            DAILY
+          </Link>
+          <Link className="hover:text-foreground" href="/about">
+            ABOUT
+          </Link>
         </div>
       </div>
     </footer>
