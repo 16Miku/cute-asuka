@@ -5,7 +5,7 @@
 - **部署地址**: https://cute-asuka.onrender.com/
 - **技术栈**: Next.js 16 + React 19 + TypeScript + Tailwind CSS v4
 - **部署平台**: Render (Static Site)
-- **当前版本**: v1.4 (2026-07-17)
+- **当前版本**: v1.5 (2026-07-17)
 
 ## 协作规范
 1. **严格遵循已有的前端架构和样式系统**。
@@ -30,12 +30,15 @@
 - **预加载**：当前图片及相邻图片通过 `<link rel="preload">` 提前加载
 - **移动端适配**：左右箭头 `hidden md:block` 已移除，所有设备均显示
 
-### 首页沉浸体验（v1.4）
-- **主文件**：`src/app/page.tsx` — 单页叙事（Hero / Narrative / Stats / Film / Portals / CTA）
-- **WebGL**：`src/components/effects/AuroraField.tsx` — WebGL2 程序化樱色极光（指针/滚动/主题感知）
+### 沉浸体验（v1.4–v1.5）
+- **首页**：`src/app/page.tsx` — 单页叙事（Hero / Narrative / Stats / Film / Portals / CTA）
+- **全站壳层**：`PageShell` + `PageHeader` — 子页共享极光环境与滚动进度
+- **WebGL**：`AuroraField.tsx` — WebGL2 程序化樱色极光（指针/滚动/主题感知）
 - **其它效果**：`ScrollProgress`、`FilmStrip`、`CountUp`
-- **样式**：`globals.css` — `color-mix`、玻璃拟态、胶片轨动画、`prefers-reduced-motion`
-- **字体**：系统明朝 display 栈 + Geist（正文；构建不依赖 Google Fonts 日文字体）
+- **Gallery**：搜索、分类统计、瀑布/网格卡片、Lightbox ←→ 切换
+- **Daily / About / Detail / CommentBoard**：统一玻璃拟态信息设计
+- **样式**：`globals.css` — `color-mix`、玻璃拟态、胶片轨、`prefers-reduced-motion`
+- **字体**：系统明朝 display 栈 + Geist
 
 ## 部署方案
 

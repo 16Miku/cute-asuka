@@ -62,20 +62,31 @@ export default function CommentBoard({ imageId }: { imageId: number }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <h3 className="text-base font-semibold tracking-wide">留言板</h3>
+    <div className="glass-panel p-5 md:p-6">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[10px] tracking-[0.28em] text-muted-foreground">
+            NOTES
+          </p>
+          <h3 className="font-display mt-1 text-xl">留言板</h3>
+        </div>
+        <p className="text-[10px] text-muted-foreground">会话级暂存</p>
+      </div>
 
-      <form onSubmit={submit} className="mt-4 grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+      <form
+        onSubmit={submit}
+        className="mt-5 grid gap-3 md:grid-cols-[1fr_2fr_auto]"
+      >
         <input
-          className="rounded-full border border-border bg-background px-3 py-2 text-sm"
+          className="rounded-full border border-border/80 bg-background/60 px-3 py-2 text-sm outline-none ring-accent/30 focus:ring-2"
           placeholder="昵称（选填）"
           value={user}
           onChange={(e) => setUser(e.target.value)}
           maxLength={20}
         />
         <input
-          className="rounded-full border border-border bg-background px-3 py-2 text-sm"
-          placeholder="留下喜欢"
+          className="rounded-full border border-border/80 bg-background/60 px-3 py-2 text-sm outline-none ring-accent/30 focus:ring-2"
+          placeholder="留下一句喜欢"
           value={body}
           onChange={(e) => setBody(e.target.value)}
           maxLength={200}
@@ -84,34 +95,32 @@ export default function CommentBoard({ imageId }: { imageId: number }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-full bg-accent px-4 py-2 text-xs text-akane-foreground transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-full bg-gradient-to-r from-rose-300 to-fuchsia-300 px-4 py-2 text-xs font-medium text-[#4a2a36] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "发送中..." : "发送"}
+          {isSubmitting ? "发送中…" : "发送"}
         </button>
       </form>
 
-      {error && (
-        <p className="mt-2 text-xs text-red-500">{error}</p>
-      )}
+      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {comments.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-4">
-            暂无评论，来抢沙发吧~ ✨
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            暂无评论，来抢沙发吧 ~
           </p>
         )}
         {comments.map((item, idx) => (
           <motion.div
-            key={idx}
+            key={`${item.createdAt}-${idx}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-border/60 bg-background p-3"
+            className="rounded-2xl border border-border/60 bg-background/50 p-3.5 backdrop-blur-sm"
           >
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{item.user}</span>
+              <span className="font-medium text-foreground/80">{item.user}</span>
               <span>{new Date(item.createdAt).toLocaleString("zh-CN")}</span>
             </div>
-            <p className="mt-1 text-sm">{item.body}</p>
+            <p className="mt-1.5 text-sm leading-relaxed">{item.body}</p>
           </motion.div>
         ))}
       </div>

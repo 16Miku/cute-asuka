@@ -1,8 +1,11 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import CommentBoard from "@/components/CommentBoard";
 import Link from "next/link";
+import PageShell from "@/components/effects/PageShell";
 
 const items = [
   {
@@ -55,16 +58,9 @@ const items = [
   },
 ];
 
-export function generateStaticParams() {
-  return items.map((item) => ({ id: String(item.id) }));
-}
-
-export default function GalleryDetail({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const id = params.id;
+export default function GalleryDetail() {
+  const params = useParams();
+  const id = String(params?.id ?? "");
   const item = items.find((it) => it.id === Number(id));
 
   if (!item) return notFound();
@@ -73,102 +69,114 @@ export default function GalleryDetail({
   const hasNext = Number(id) < items.length;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <p className="text-xs text-muted-foreground">
-            #{item.id.toString().padStart(3, "0")} · {item.date} ·{" "}
-            {item.tags.join(" / ")}
-          </p>
-          <h1 className="mt-1 text-2xl font-bold tracking-wider">
-            {item.title}
-          </h1>
+    <PageShell intensity={0.5}>
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
+        <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-[11px] tracking-[0.28em] text-muted-foreground">
+              FEATURED · #{item.id.toString().padStart(3, "0")} · {item.date}
+            </p>
+            <h1 className="font-display mt-2 text-3xl md:text-5xl">
+              {item.title}
+            </h1>
+          </div>
+          <Link
+            href="/gallery"
+            className="text-xs tracking-[0.2em] text-muted-foreground hover:text-foreground"
+          >
+            ← 返回画廊
+          </Link>
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-border/70 bg-card shadow-xl"
+          >
+            <Image
+              src={item.src}
+              alt={item.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            className="glass-panel flex flex-col justify-between p-6 md:p-8"
+          >
+            <div>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {item.description}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {item.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-border/80 bg-background/50 px-3 py-1 text-xs text-muted-foreground"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={item.src}
+                  download
+                  className="rounded-full bg-gradient-to-r from-rose-300 to-fuchsia-300 px-4 py-2 text-xs font-medium text-[#4a2a36]"
+                >
+                  下载原图
+                </a>
+                <button
+                  className="btn-glass-solid text-xs"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/gallery/${item.id}`
+                    );
+                  }}
+                >
+                  复制分享链接
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs tracking-wide text-muted-foreground">
+                <Link
+                  href={`/gallery/${item.id - 1}`}
+                  className={!hasPrev ? "invisible" : "hover:text-foreground"}
+                >
+                  ← 上一张
+                </Link>
+                <span>
+                  {item.id} / {items.length}
+                </span>
+                <Link
+                  href={`/gallery/${item.id + 1}`}
+                  className={!hasNext ? "invisible" : "hover:text-foreground"}
+                >
+                  下一张 →
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-card"
+          transition={{ delay: 0.16 }}
+          className="mt-12"
         >
-          <Image
-            src={item.src}
-            alt={item.title}
-            fill
-            className="object-cover"
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="space-y-4"
-        >
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {item.description}
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {item.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <a
-              href={item.src}
-              download
-              className="rounded-full bg-accent px-3 py-1.5 text-xs text-akane-foreground"
-            >
-              下载原图
-            </a>
-            <button
-              className="rounded-full border border-border px-3 py-1.5 text-xs"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/gallery/${item.id}`
-                  );
-                }
-              }}
-            >
-              复制分享链接
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
-            <Link
-              href={`/gallery/${item.id - 1}`}
-              className={!hasPrev ? "invisible" : ""}
-            >
-              ← 上一张
-            </Link>
-            <Link href="/gallery">返回画廊</Link>
-            <Link
-              href={`/gallery/${item.id + 1}`}
-              className={!hasNext ? "invisible" : ""}
-            >
-              下一张 →
-            </Link>
-          </div>
+          <CommentBoard imageId={item.id} />
         </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mt-12"
-      >
-        <CommentBoard imageId={item.id} />
-      </motion.div>
-    </div>
+    </PageShell>
   );
 }
