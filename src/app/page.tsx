@@ -141,18 +141,20 @@ export default function Home() {
           style={{ scale: heroScale, opacity: heroOpacity }}
           className="absolute inset-0"
         >
-          <div className="absolute inset-0 md:inset-4 md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-rose-500/10">
+          <div className="absolute inset-0 z-0 md:inset-4 md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-rose-500/10">
             <HeroCarousel
               mobileImages={mobileHeroImages}
               desktopImages={desktopHeroImages}
               interval={6500}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/15 to-[var(--background)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,182,193,0.25),transparent_50%)]" />
+            {/* 视觉遮罩：pointer-events-none，避免挡住轮播箭头/圆点 */}
+            <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/35 via-black/15 to-[var(--background)]" />
+            <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_30%_20%,rgba(255,182,193,0.25),transparent_50%)]" />
           </div>
         </motion.div>
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 md:justify-center md:pb-24 md:pt-20">
+        {/* 文案层默认不拦截指针；链接/按钮单独恢复可点 */}
+        <div className="pointer-events-none relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 md:justify-center md:pb-24 md:pt-20">
           <motion.div style={{ y: titleY }} className="max-w-3xl">
             <motion.p
               initial={{ opacity: 0, y: 12 }}
@@ -199,7 +201,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45, duration: 0.7 }}
-              className="mt-8 flex flex-wrap items-center gap-3"
+              className="pointer-events-auto mt-8 flex flex-wrap items-center gap-3"
             >
               <Link href="/gallery" className="btn-glass-primary">
                 进入画廊

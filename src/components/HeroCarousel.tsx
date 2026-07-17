@@ -101,7 +101,7 @@ export default function HeroCarousel({
           transition={{
             opacity: { duration: 0.5, ease: "easeInOut" },
           }}
-          className="absolute inset-0"
+          className="pointer-events-none absolute inset-0 z-0"
         >
           <Image
             src={currentImage}
@@ -114,15 +114,19 @@ export default function HeroCarousel({
         </motion.div>
       </AnimatePresence>
 
-      {/* 渐变遮罩 - 已调轻，确保图片清晰可见 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/15" />
+      {/* 渐变遮罩 - 不拦截点击 */}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/5 via-transparent to-black/15" />
 
-      {/* 左右箭头 - 移动端也展示 */}
+      {/* 控件层：高于图片与遮罩，保证可点 */}
       {showArrows && images.length > 1 && (
         <>
           <button
-            onClick={() => navigate(-1)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 md:left-4"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(-1);
+            }}
+            className="absolute left-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:left-4 md:p-3"
             aria-label="上一张"
           >
             <svg
@@ -140,8 +144,12 @@ export default function HeroCarousel({
             </svg>
           </button>
           <button
-            onClick={() => navigate(1)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-white/10 p-2 text-white backdrop-blur-sm transition hover:bg-white/20 md:right-4"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(1);
+            }}
+            className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:right-4 md:p-3"
             aria-label="下一张"
           >
             <svg
@@ -163,15 +171,19 @@ export default function HeroCarousel({
 
       {/* 底部指示点 */}
       {showDots && images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 gap-2">
           {images.map((_, index) => (
             <button
+              type="button"
               key={index}
-              onClick={() => goTo(index)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              onClick={(e) => {
+                e.stopPropagation();
+                goTo(index);
+              }}
+              className={`h-2 rounded-full transition-all duration-300 ${
                 index === currentIndex
-                  ? "w-6 bg-white"
-                  : "w-1.5 bg-white/40 hover:bg-white/60"
+                  ? "w-7 bg-white"
+                  : "w-2 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`切换到第 ${index + 1} 张`}
             />
