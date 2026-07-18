@@ -91,31 +91,45 @@ export default function HeroCarousel({
         />
       ))}
 
-      {/* 轮播图片 - 交叉淡入淡出，无空白间隙 */}
+      {/*
+        object-cover + object-top：优先保证画面上方（脸部）不被裁掉。
+        底层模糊仅作切换过渡。
+      */}
       <AnimatePresence mode="popLayout">
         <motion.div
           key={`${isDesktop ? "desktop" : "mobile"}-${currentIndex}`}
-          initial={{ opacity: 0.3 }}
+          initial={{ opacity: 0.35 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0.3 }}
+          exit={{ opacity: 0.35 }}
           transition={{
             opacity: { duration: 0.5, ease: "easeInOut" },
           }}
           className="pointer-events-none absolute inset-0 z-0"
         >
+          <div className="absolute inset-0 bg-[#1a1014]" />
+          <Image
+            src={currentImage}
+            alt=""
+            fill
+            aria-hidden
+            className="scale-110 object-cover object-top opacity-40 blur-xl"
+            sizes="100vw"
+            unoptimized
+          />
           <Image
             src={currentImage}
             alt={`轮播图 ${currentIndex + 1}`}
             fill
             priority
-            className="object-cover object-center"
+            className="object-cover object-top"
             sizes="100vw"
+            unoptimized
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* 渐变遮罩 - 不拦截点击 */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/5 via-transparent to-black/15" />
+      {/* 画面保持通透；底部极轻压暗仅服务指示点 */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-14 bg-gradient-to-t from-black/30 to-transparent" />
 
       {/* 控件层：高于图片与遮罩，保证可点 */}
       {showArrows && images.length > 1 && (
@@ -171,7 +185,7 @@ export default function HeroCarousel({
 
       {/* 底部指示点 */}
       {showDots && images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 gap-2 md:bottom-5">
           {images.map((_, index) => (
             <button
               type="button"

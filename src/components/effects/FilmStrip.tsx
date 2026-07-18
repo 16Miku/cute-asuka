@@ -15,8 +15,10 @@ export default function FilmStrip({
   reverse = false,
 }: Props) {
   const loop = useMemo(() => [...images, ...images], [images]);
-  const dur =
-    speed === "slow" ? "70s" : speed === "fast" ? "32s" : "48s";
+  // 图片越多，滚动周期越长，避免「飞得太快」
+  const base =
+    speed === "slow" ? 1.1 : speed === "fast" ? 0.55 : 0.8;
+  const durSec = Math.max(40, Math.round(images.length * base * 1.2));
 
   if (!images.length) return null;
 
@@ -24,7 +26,7 @@ export default function FilmStrip({
     <div className="film-strip relative overflow-hidden py-3">
       <div
         className={`film-track flex w-max gap-3 ${reverse ? "film-track-reverse" : ""}`}
-        style={{ ["--film-duration" as string]: dur }}
+        style={{ ["--film-duration" as string]: `${durSec}s` }}
       >
         {loop.map((src, i) => (
           <div
@@ -37,6 +39,7 @@ export default function FilmStrip({
               fill
               className="object-cover"
               sizes="224px"
+              loading="lazy"
               unoptimized
             />
             <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10" />

@@ -71,13 +71,6 @@ const desktopHeroImages = [
   "/web-banner/官网图5.jpg",
 ];
 
-const stripImages = [
-  ...desktopHeroImages.slice(0, 6),
-  features[0].cover,
-  features[1].cover,
-  features[2].cover,
-];
-
 const moments = [
   {
     kicker: "Capture",
@@ -102,20 +95,30 @@ export default function Home() {
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.35]);
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  /* 轻微缩放即可，过大 scale 会裁掉 contain 后的完整画面感 */
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.02]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.4]);
+  const titleY = useTransform(scrollYProgress, [0, 1], [0, 48]);
 
   const [stats, setStats] = useState({ gif: 0, static: 0, total: 0 });
   const [ready, setReady] = useState(false);
+  /** Film Roll：全部静态馆藏图（jpg/png/webp，不含 gif） */
+  const [staticStripImages, setStaticStripImages] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/images", { cache: "no-store" })
       .then((res) => (res.ok ? (res.json() as Promise<string[]>) : []))
       .then((files) => {
         if (!files.length) return;
-        const gif = files.filter((f) => f.toLowerCase().endsWith(".gif")).length;
-        setStats({ gif, static: files.length - gif, total: files.length });
+        const isGif = (f: string) => f.toLowerCase().endsWith(".gif");
+        const staticFiles = files.filter((f) => !isGif(f));
+        const gif = files.length - staticFiles.length;
+        setStats({
+          gif,
+          static: staticFiles.length,
+          total: files.length,
+        });
+        setStaticStripImages(staticFiles.map((f) => `/images/${f}`));
       })
       .catch(() => {})
       .finally(() => setReady(true));
@@ -132,77 +135,48 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_transparent_0%,_var(--background)_72%)]" />
       </div>
 
-      {/* ─── HERO ─── */}
+      {/* ─── HERO：图上叠字+按钮，无玻璃板，仅字影与底部轻渐变 ─── */}
       <section
         ref={heroRef}
-        className="relative z-10 min-h-[100svh] overflow-hidden"
+        className="relative z-10 flex min-h-[100svh] items-center justify-center overflow-hidden"
       >
         <motion.div
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0"
+          className="absolute inset-0 flex items-center justify-center p-0 md:p-4"
         >
-          <div className="absolute inset-0 z-0 md:inset-4 md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-rose-500/10">
+          <div className="relative h-full w-full overflow-hidden border border-white/10 shadow-2xl shadow-rose-500/10 md:h-auto md:max-h-[min(92svh,900px)] md:max-w-[min(100%,1400px)] md:rounded-[2rem] md:aspect-[16/9]">
             <HeroCarousel
               mobileImages={mobileHeroImages}
               desktopImages={desktopHeroImages}
               interval={6500}
             />
-            {/* 视觉遮罩：pointer-events-none，避免挡住轮播箭头/圆点 */}
-            <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/35 via-black/15 to-[var(--background)]" />
-            <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_30%_20%,rgba(255,182,193,0.25),transparent_50%)]" />
+            {/* 底部轻渐变：抬文字可读性，不是卡片底板 */}
+            <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-black/10 to-transparent to-60%" />
           </div>
         </motion.div>
 
-        {/* 文案层默认不拦截指针；链接/按钮单独恢复可点 */}
-        <div className="pointer-events-none relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 md:justify-center md:pb-24 md:pt-20">
-          <motion.div style={{ y: titleY }} className="max-w-3xl">
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] tracking-[0.28em] text-white/90 backdrop-blur-md"
-            >
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-300" />
-              NOGIZAKA · FAN ARCHIVE · v1.4
-            </motion.p>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.08, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-[clamp(2.75rem,8vw,5.75rem)] font-medium leading-[0.95] tracking-tight text-white drop-shadow-lg"
-            >
-              <span className="block">Cute</span>
-              <span className="block bg-gradient-to-r from-white via-rose-100 to-fuchsia-200 bg-clip-text text-transparent">
+        {/* 右下文案：无背景板/无边框/无磨砂 */}
+        <div className="pointer-events-none relative z-10 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col items-end justify-end px-4 pb-5 pt-24 md:pb-7 md:pt-16">
+          <motion.div
+            style={{ y: titleY }}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-md text-right"
+          >
+            <h1 className="hero-caption-title font-display text-[clamp(2.1rem,5.5vw,3.5rem)] font-medium leading-[1.05] tracking-tight text-white">
+              Cute{" "}
+              <span className="bg-gradient-to-r from-rose-100 via-white to-fuchsia-200 bg-clip-text text-transparent">
                 Asuka
               </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.7 }}
-              className="mt-2 font-display text-2xl text-white/80 md:text-3xl"
-            >
+            </h1>
+            <p className="hero-caption-title mt-2 font-display text-base text-white/90 md:text-lg">
               齋藤飛鳥 · 表情包光年
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32, duration: 0.7 }}
-              className="mt-5 max-w-xl text-sm leading-relaxed text-white/85 md:text-base"
-            >
-              把舞台侧光、镜头余温与心跳漏拍，做成可滑动、可下载的数字标本。
-              下方是一场为她编排的单页巡礼——滚动即叙事。
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.7 }}
-              className="pointer-events-auto mt-8 flex flex-wrap items-center gap-3"
-            >
+            </p>
+            <p className="hero-caption-title ml-auto mt-3 max-w-sm text-xs leading-relaxed text-white/80 md:text-sm">
+              把舞台侧光与心跳瞬间，收成可保存、可分享的表情包。
+            </p>
+            <div className="pointer-events-auto mt-6 flex flex-wrap items-center justify-end gap-3">
               <Link href="/gallery" className="btn-glass-primary">
                 进入画廊
               </Link>
@@ -212,17 +186,17 @@ export default function Home() {
               <Link href="/daily" className="btn-glass">
                 今日一图
               </Link>
-            </motion.div>
+            </div>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.1 }}
-            className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] tracking-[0.35em] text-white/60 md:flex"
+            transition={{ delay: 1 }}
+            className="mt-4 hidden w-full flex-col items-center gap-1 text-[10px] tracking-[0.35em] text-white/50 md:flex"
           >
             SCROLL
-            <span className="scroll-chevron h-8 w-px bg-gradient-to-b from-white/70 to-transparent" />
+            <span className="scroll-chevron h-6 w-px bg-gradient-to-b from-white/60 to-transparent" />
           </motion.div>
         </div>
       </section>
@@ -299,16 +273,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── FILM STRIP ─── */}
+      {/* ─── FILM STRIP：全部静态馆藏 ─── */}
       <section className="relative z-10 pb-8 md:pb-12">
         <div className="mx-auto mb-4 max-w-6xl px-4">
           <p className="text-[11px] tracking-[0.32em] text-muted-foreground">
             02 — FILM ROLL
           </p>
           <h2 className="font-display mt-2 text-2xl md:text-4xl">胶片在滑动</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {ready
+              ? `全部 ${staticStripImages.length} 张静态馆藏 · 双轨滚动`
+              : "加载静态馆藏中…"}
+          </p>
         </div>
-        <FilmStrip images={stripImages} speed="med" />
-        <FilmStrip images={[...stripImages].reverse()} speed="slow" reverse />
+        {staticStripImages.length > 0 ? (
+          <>
+            <FilmStrip images={staticStripImages} speed="med" />
+            <FilmStrip
+              images={[...staticStripImages].reverse()}
+              speed="slow"
+              reverse
+            />
+          </>
+        ) : (
+          <div className="mx-auto max-w-6xl px-4 py-10 text-center text-sm text-muted-foreground">
+            暂无静态图片
+          </div>
+        )}
       </section>
 
       {/* ─── BENTO FEATURES ─── */}
