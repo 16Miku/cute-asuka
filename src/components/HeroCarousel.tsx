@@ -34,21 +34,18 @@ export default function HeroCarousel({
   showArrows = true,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [preloadWindow, setPreloadWindow] = useState<number[]>([]);
-  /** 手动切换后短暂忽略连点，减少动画未结束时的连跳感 */
+  /** 手动切换后短暂忽略连点，防止动画期间连点叠跳 */
   const lockUntilRef = useRef(0);
 
   const images = isDesktop ? desktopImages : mobileImages;
   const len = images.length;
 
-  // 桌面/移动素材切换时回到第一张
   useEffect(() => {
     setCurrentIndex(0);
   }, [isDesktop]);
 
-  // 索引越界保护（素材列表变化时）
   useEffect(() => {
     if (len <= 0) return;
     setCurrentIndex((i) => (i >= len ? 0 : i));
@@ -62,12 +59,12 @@ export default function HeroCarousel({
   }, [currentIndex, len]);
 
   /**
-   * 自动播放：用 setTimeout，并依赖 currentIndex。
-   * 手动切图会改 index → 清理旧定时器 → 重新计满 interval，
-   * 避免「刚点下一张，定时器马上又触发」连跳两张。
+   * 自动播放：每次 currentIndex 变化都重置计时。
+   * - 手动切图 → 重新倒计时满 interval，不会马上再跳
+   * - 不用 focus/hover 暂停，避免点击后焦点留在按钮上导致永停
    */
   useEffect(() => {
-    if (len <= 1 || paused || interval <= 0) return;
+    if (len <= 1 || interval <= 0) return;
 
     const reduceMotion =
       typeof window !== "undefined" &&
@@ -79,14 +76,13 @@ export default function HeroCarousel({
     }, interval);
 
     return () => window.clearTimeout(timer);
-  }, [currentIndex, len, interval, paused]);
+  }, [currentIndex, len, interval]);
 
   const canInteract = useCallback(() => {
     return performance.now() >= lockUntilRef.current;
   }, []);
 
   const armLock = useCallback(() => {
-    // 与过渡时长接近，防止连点堆叠
     lockUntilRef.current = performance.now() + 420;
   }, []);
 
@@ -117,17 +113,7 @@ export default function HeroCarousel({
   const currentImage = images[currentIndex] || "/images/placeholder.jpg";
 
   return (
-    <div
-      className="relative h-full w-full overflow-hidden"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-          setPaused(false);
-        }
-      }}
-    >
+    <div className="relative h-full w-full overflow-hidden">
       {preloadWindow.map((idx) => (
         <link
           key={`preload-${idx}`}
@@ -179,6 +165,7 @@ export default function HeroCarousel({
             onClick={(e) => {
               e.stopPropagation();
               navigate(-1);
+              (e.currentTarget as HTMLButtonElement).blur();
             }}
             className="absolute left-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:left-4 md:p-3"
             aria-label="上一张"
@@ -202,6 +189,7 @@ export default function HeroCarousel({
             onClick={(e) => {
               e.stopPropagation();
               navigate(1);
+              (e.currentTarget as HTMLButtonElement).blur();
             }}
             className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:right-4 md:p-3"
             aria-label="下一张"
@@ -232,6 +220,7 @@ export default function HeroCarousel({
               onClick={(e) => {
                 e.stopPropagation();
                 goTo(index);
+                (e.currentTarget as HTMLButtonElement).blur();
               }}
               className={`h-2 rounded-full transition-all duration-300 ${
                 index === currentIndex
