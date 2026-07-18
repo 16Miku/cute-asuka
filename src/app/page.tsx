@@ -148,7 +148,7 @@ export default function Home() {
             <HeroCarousel
               mobileImages={mobileHeroImages}
               desktopImages={desktopHeroImages}
-              interval={6500}
+              interval={4000}
             />
             {/* 底部轻渐变：抬文字可读性，不是卡片底板 */}
             <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-black/10 to-transparent to-60%" />
