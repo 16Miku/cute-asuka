@@ -114,11 +114,16 @@ CDN (Render Static Site 自带)
 ### 最佳实践
 - 图片、视频等大文件使用 CDN 或外部存储
 - 使用 `force-static` 明确标记静态 API
-- 提交前务必运行 `npm run build` 验证
-- 保留 `generateStaticParams()` 签名供动态路由使用
-- 桌面端/移动端分别准备素材，通过 `useMediaQuery` 动态切换
+- 提交前务必运行 `npm run build` 验证（**生成 `dist/` 仅作本地检查，不要提交 `dist/`**）
+- 画廊详情依赖 `generateStaticParams()`，新增 `public/images` 后需重新 build
+- 桌面端/移动端分别准备 banner 素材，通过 `useMediaQuery` 切换
+
+### 仓库与 dist（v1.7+）
+- `.gitignore` 忽略整个 `dist/`
+- Render Build Command 负责生成并发布产物
+- Git 只跟踪源码与 `public/` 素材
 
 ---
 
-**记录日期**: 2025-06-24
-**项目版本**: v1.2
+**记录日期**: 2026-07-18  
+**项目版本**: v1.7

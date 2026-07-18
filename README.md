@@ -1,7 +1,6 @@
 # Cute Asuka — 斋藤飞鸟可爱表情包展示站
 
-> 🌸 乃木坂风格的可爱表情包小站，献给斋藤飞鸟 
-> 
+> 🌸 乃木坂风格的可爱表情包小站，献给斋藤飞鸟  
 > 在线访问：https://cute-asuka.onrender.com/
 
 ---
@@ -9,64 +8,60 @@
 ## 📖 项目概述
 
 ### 目标
-- 展示斋藤飞鸟表情包，支持分类浏览、预览、下载和分享
-- 采用乃木坂风格：克制、干净、粉白调
-- 打造粉丝向精品小站，兼具美观与实用性
+- 展示斋藤飞鸟表情包：分类浏览、预览、下载、分享
+- 视觉：粉白、克制、乃木坂气质
+- 粉丝向精品小站，美观与好用并重
 
 ### 技术栈
 | 类别 | 技术 |
 |------|------|
 | **框架** | Next.js 16 + React 19 + TypeScript |
 | **样式** | Tailwind CSS v4 + Framer Motion |
-| **部署** | Render (Static Site) |
-| **CI/CD** | GitHub Actions |
+| **特效** | WebGL2 极光背景（装饰层，非业务必需） |
+| **部署** | Render Static Site（构建时生成 `dist`） |
+
+**当前版本：v1.7**（2026-07-18）
 
 ---
 
 ## 🖥 功能特性
 
-### 已实现功能
-
 | 功能 | 描述 |
 |------|------|
-| 🎠 **首页轮播图** | 淡入淡出 Hero 背景，桌面端/移动端展示不同素材，自动切换 |
-| 🖼 **表情包画廊** | 分类浏览（静态/动态）、Lightbox 预览、下载、分享 |
-| 📆 **每日一图** | 基于日期种子随机挑选，每天展示不同表情包 |
-| 💬 **留言板** | 支持评论互动（前端暂存，会话级别） |
-| 🌗 **主题切换** | 浅色 / 深色模式，localStorage 持久化 |
-| 📊 **实时统计** | 首页展示 GIF/静态图/总计数量 |
+| 🎠 **首页 Hero** | 桌面/移动分素材轮播；`object-top` 优先露脸；右下叠字+按钮（无玻璃卡） |
+| 🎞 **Film Roll** | 首页双轨滚动**全部静态馆藏**（非 gif） |
+| 🖼 **表情包画廊** | 分类 / 搜索 / 装裱瀑布 / Lightbox（键盘切换）/ 详情深链 |
+| 📄 **详情页** | 与 `/api/images` 同一排序的真实文件；下载、留言 |
+| 📆 **每日一图** | 日期种子固定当日一帧，可进详情 |
+| 💬 **留言板** | 前端暂存，会话级 |
+| 🌗 **主题切换** | 浅/深色，localStorage |
+| 📊 **馆藏统计** | 首页 GIF / 静态 / 总计 |
 
-### 交互体验
-- 响应式设计，完美适配移动端
-- 键盘 ESC 关闭 Lightbox
-- 图片懒加载，优化首屏性能
-- Hover 动效和页面过渡动画
+### 交互要点
+- 响应式；Lightbox ESC / ← →
+- 图片懒加载（画廊、胶片轨）
+- 尊重 `prefers-reduced-motion`
 
 ---
 
-## 🚀 部署方案
+## 🚀 部署
 
-### 生产环境
-- **平台**: [Render](https://render.com) — Static Site
-- **域名**: https://cute-asuka.onrender.com/
-- **构建方式**: Static HTML Export (`next export`)
+### 生产
+- **平台**: [Render](https://render.com) — Static Site  
+- **域名**: https://cute-asuka.onrender.com/  
+- **流程**: 推送 `master` → Render 执行 build → 发布 `dist`
 
-### 部署架构
 ```
-GitHub Repo ──▶ Render ──▶ Static Site
-   │                          │
-   └─ CI/CD (GitHub Actions)  └─ CDN 加速
+GitHub (源码) ──build──▶ dist/ ──▶ Render CDN
 ```
 
-### Render 部署参数
 | 配置项 | 值 |
 |--------|-----|
-| **Name** | cute-asuka |
 | **Build Command** | `npm install && npm run build` |
 | **Publish Directory** | `dist` |
 | **Branch** | `master` |
 
-### 构建配置 (next.config.ts)
+### 构建配置（next.config.ts）
 ```typescript
 import type { NextConfig } from "next";
 
@@ -74,38 +69,33 @@ const nextConfig: NextConfig = {
   output: "export",
   distDir: "dist",
   images: {
-    unoptimized: true,  // 静态导出必需
+    unoptimized: true,
   },
 };
 
 export default nextConfig;
 ```
 
+### 关于 `dist/`
+- **不要提交到 Git**（已在 `.gitignore`）  
+- 本地 `npm run build` 仅用于自检；线上由 Render 生成  
+
 ---
 
 ## 🛠 本地开发
 
-### 快速开始
 ```bash
-# 克隆仓库
 git clone https://github.com/16Miku/cute-asuka.git
 cd cute-asuka
-
-# 安装依赖
 npm install
-
-# 启动开发服务器
-npm run dev
-# 访问 http://localhost:3000
+npm run dev    # http://localhost:3000
 ```
 
-### 常用命令
-```bash
-npm run dev      # 开发模式 (Turbopack, HMR)
-npm run build    # 生产构建 (静态导出)
-npm run start    # 预览生产构建
-npm run lint     # ESLint 代码检查
-```
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | 开发（Turbopack） |
+| `npm run build` | 静态导出到 `dist/` |
+| `npm run lint` | ESLint |
 
 ---
 
@@ -114,108 +104,89 @@ npm run lint     # ESLint 代码检查
 ```
 cute-asuka/
 ├── public/
-│   ├── images/              # 表情包素材 (200+)
-│   ├── web-banner/          # 桌面端轮播图素材
-│   └── sp-banner/           # 移动端轮播图素材
+│   ├── images/                 # 表情包 (200+)
+│   ├── web-banner/             # 桌面 Hero
+│   └── sp-banner/              # 移动 Hero
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx            # 首页 (轮播图 Hero)
-│   │   ├── gallery/page.tsx    # 画廊页
-│   │   ├── daily/page.tsx      # 每日一图
-│   │   ├── about/page.tsx      # 关于页
+│   │   ├── page.tsx            # 首页
+│   │   ├── gallery/
+│   │   │   ├── page.tsx        # 画廊
+│   │   │   └── [id]/           # 详情（静态路径 = 真实图数量）
+│   │   ├── daily/page.tsx
+│   │   ├── about/page.tsx
+│   │   ├── globals.css
 │   │   └── api/
-│   │       ├── images/route.ts # 图片列表 API (静态)
-│   │       └── comments/route.ts # 留言 API (静态)
+│   │       ├── images/route.ts
+│   │       └── comments/route.ts
 │   ├── components/
-│   │   ├── HeroCarousel.tsx    # 轮播图组件 ⭐新增
-│   │   ├── Navbar.tsx          # 导航栏
-│   │   ├── Footer.tsx          # 页脚
-│   │   ├── CommentBoard.tsx    # 留言板
-│   │   ├── ImageGrid.tsx       # 图片网格
-│   │   ├── ThemeProvider.tsx   # 主题上下文
-│   │   └── ThemeToggle.tsx     # 主题切换按钮
-│   └── globals.css             # 全局样式 + 主题变量
-├── next.config.ts              # Next.js 配置
-├── package.json
-└── README.md
+│   │   ├── HeroCarousel.tsx
+│   │   ├── Lightbox.tsx
+│   │   ├── CommentBoard.tsx
+│   │   ├── Navbar / Footer / Theme*
+│   │   └── effects/            # Aurora、FilmStrip、PageShell 等
+│   └── lib/
+│       └── gallery.ts          # 图库单一数据源
+├── docs/DEPLOYMENT.md
+├── AGENT.md                    # Agent 协作规范
+├── next.config.ts
+└── package.json
 ```
-
----
-
-## ⚡ 性能优化
-
-### 本次迭代优化
-| 优化项 | 描述 |
-|--------|------|
-| **大文件清理** | 删除 98MB 超大 GIF，解除 Git Push 限制 |
-| **API 缓存** | images API 使用静态构建缓存，避免运行时读取磁盘 |
-| **图片懒加载** | Gallery 图片添加 `loading="lazy"`，优化首屏 |
-| **代码优化** | CommentBoard 空状态、加载状态、错误处理 |
-| **轮播图响应式** | 桌面端/移动端分别展示不同比例素材（web-banner / sp-banner） |
-| **Static Export** | 全站静态导出，适合 CDN 部署，极速加载 |
 
 ---
 
 ## 📝 开发规范
 
-- **组件**: 客户端组件使用 `"use client"`
-- **样式**: 统一使用 Tailwind CSS 与主题变量
-- **提交信息**: 使用语义化中文提交，例如 `feat(gallery): 增加置顶功能`
-- **分支**: 使用 `master` 主分支
-- **轮播图素材规范**: 桌面端图片存放于 `public/web-banner/`，移动端图片存放于 `public/sp-banner/`，并在 `src/app/page.tsx` 中分别引入到 `desktopHeroImages` 和 `mobileHeroImages` 数组中
+- 客户端组件：`"use client"`
+- 样式：Tailwind + 主题变量；`dark:` 适配深色
+- 提交：语义化中文，如 `feat(gallery): …`
+- 分支：`master`
+- 轮播素材：桌面 `web-banner`、移动 `sp-banner`，在 `page.tsx` 数组中维护
+- 图库逻辑：优先改 `src/lib/gallery.ts`，避免各页复制规则
+- **勿提交 `dist/`**
 
 ---
 
 ## 🎨 素材说明
 
-- **来源**: 斋藤飞鸟粉丝收集
-- **格式**: JPG、PNG、GIF、WEBP
-- **总量**: 200+ 张
-- **部署目录**: `public/images/`
+- **来源**: 粉丝收集，仅供学习交流  
+- **格式**: JPG / PNG / GIF / WEBP  
+- **目录**: `public/images/`（馆藏）、banner 目录（首页轮播）  
 
 ---
 
 ## 📅 更新日志
 
-### v1.0 (2025-06-24)
-- ✅ 初始版本核心功能
-- ✅ 表情包画廊 + Lightbox + 下载
-- ✅ 每日一图、评论板、主题切换
+### v1.7 (2026-07-18) ⭐当前版本
+- 🎠 首页大屏：`object-top` 铺满、去版本徽章；右下叠字+按钮（无玻璃板）
+- 🎞 Film Roll 使用全部静态馆藏；滚动时长随数量变化
+- 🗑 移除首页 CRAFT STACK 技术展示条
+- 📦 **`dist/` 不再入库**，由 Render 构建生成
 
-### v1.6 (2026-07-17) ⭐当前版本
-- 🖼 **A 标杆精修**：Gallery 装裱/粘性筛选、Daily 胶片展陈、字阶 token
-- 🔗 **B 数据统一**：`lib/gallery` 单一数据源；详情页对接全部真实图片（非 6 条假数据）
-- Lightbox 与 `/gallery/[id]` 互相跳转
+### v1.6 (2026-07-17)
+- Gallery / Daily 标杆精修；`lib/gallery` 统一真实图库与详情静态路径
+- Lightbox 与详情互链
 
 ### v1.5 (2026-07-17)
-- 🏛 全站 PageShell / Gallery 搜索 / 玻璃拟态子页
+- 全站 PageShell、画廊搜索、玻璃拟态子页
 
 ### v1.4 (2026-07-17)
-- 🌌 首页 WebGL 极光与单页叙事
+- 首页 WebGL 极光与滚动叙事单页
 
 ### v1.3 (2025-06-25)
-- 🎠 **轮播图体验优化**
-  - 修复切换空白问题（从 scale + opacity 动画改为纯 opacity 交叉淡入淡出）
-  - 添加图片预加载机制，相邻图片提前预加载
-  - 移动端显示左右切换箭头（移除 `hidden md:block` 限制）
-  - 优化箭头位置适配移动端（`left-2` / `right-2`）
-- 🗑 **仓库清理**：`dist/` 整体忽略，由 CI/Render 构建生成，避免提交静态产物
+- 轮播空白修复、预加载、移动端箭头
 
 ### v1.2 (2025-06-25)
-- 🎠 **轮播图视觉优化**
-  - 降低暗色遮罩透明度（`from-black/20 via-black/10 to-black/40` → `from-black/5 via-transparent to-black/15`），图片更清晰明亮
-  - 桌面端高度增加（`h-[85vh]` → `h-[92vh] + min-h-[600px]`），避免横屏图裁切显示不全
-- 🚀 适配 Render 静态部署
+- 轮播视觉与 Render 静态部署
 
 ### v1.1 (2025-06-24)
-- 🎠 首页 Hero 背景改为轮播图（5 张精选，淡入淡出）
-- 🗑 清理 98MB 大文件，Git 历史瘦身
-- ⚡ API 性能优化（静态缓存）
-- 🔧 Gallery 交互增强（ESC 关闭、懒加载）
+- Hero 轮播、大文件清理、API 缓存
+
+### v1.0 (2025-06-24)
+- 画廊 / 每日一图 / 留言 / 主题切换
 
 ---
 
-## 🤝 技术交流
+## 🤝 交流
 
-如有问题或建议，欢迎提交 Issue 或联系作者。
-
+问题或建议欢迎提 Issue。内容仅供学习交流，与官方无关。
