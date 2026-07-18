@@ -12,8 +12,26 @@ const SECTIONS = [
   { id: "close", label: "07" },
 ] as const;
 
+/**
+ * 章节导航：大屏（Hero）可见时整体隐藏，避免与轮播右箭头重叠误点。
+ */
 export default function SectionNav() {
   const [active, setActive] = useState("hero");
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    const updatePastHero = () => {
+      // 滚过约半屏后再显示，确保大屏箭头区域已离开
+      setPastHero(window.scrollY > window.innerHeight * 0.55);
+    };
+    updatePastHero();
+    window.addEventListener("scroll", updatePastHero, { passive: true });
+    window.addEventListener("resize", updatePastHero);
+    return () => {
+      window.removeEventListener("scroll", updatePastHero);
+      window.removeEventListener("resize", updatePastHero);
+    };
+  }, []);
 
   useEffect(() => {
     const els = SECTIONS.map((s) => document.getElementById(s.id)).filter(
@@ -36,14 +54,20 @@ export default function SectionNav() {
 
   return (
     <nav
-      className="pointer-events-none fixed right-3 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-2 md:flex"
+      className={`fixed right-3 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 transition-all duration-300 md:flex ${
+        pastHero
+          ? "pointer-events-auto opacity-100"
+          : "pointer-events-none opacity-0"
+      }`}
       aria-label="页面章节"
+      aria-hidden={!pastHero}
     >
       {SECTIONS.map((s) => (
         <a
           key={s.id}
           href={`#${s.id}`}
-          className={`pointer-events-auto group flex items-center justify-end gap-2 transition ${
+          tabIndex={pastHero ? 0 : -1}
+          className={`group flex items-center justify-end gap-2 transition ${
             active === s.id ? "opacity-100" : "opacity-40 hover:opacity-80"
           }`}
         >

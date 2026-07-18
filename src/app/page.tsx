@@ -185,10 +185,7 @@ export default function Home() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-md text-right"
           >
-            <p className="text-[10px] tracking-[0.35em] text-white/60">
-              SINGLE-PAGE ARCHIVE · WEBGL
-            </p>
-            <h1 className="hero-caption-title font-display mt-2 text-[clamp(2.1rem,5.5vw,3.5rem)] font-medium leading-[1.05] text-white">
+            <h1 className="hero-caption-title font-display text-[clamp(2.1rem,5.5vw,3.5rem)] font-medium leading-[1.05] text-white">
               Cute{" "}
               <span className="bg-gradient-to-r from-rose-100 via-white to-fuchsia-200 bg-clip-text text-transparent">
                 Asuka
@@ -196,9 +193,6 @@ export default function Home() {
             </h1>
             <p className="hero-caption-title mt-2 font-display text-base text-white/90 md:text-lg">
               齋藤飛鳥 · 表情包光年
-            </p>
-            <p className="hero-caption-title ml-auto mt-3 max-w-sm text-xs leading-relaxed text-white/80 md:text-sm">
-              滚动即巡礼：光场、叙事、馆藏、胶片、今日帧——一页读完这场粉白展览。
             </p>
             <div className="pointer-events-auto mt-6 flex flex-wrap items-center justify-end gap-3">
               <a href="#archive" className="btn-glass-primary">

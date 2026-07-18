@@ -203,7 +203,7 @@ export default function HeroCarousel({
               e.stopPropagation();
               navigate(1);
             }}
-            className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:right-4 md:p-3"
+            className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/40 bg-black/25 p-2.5 text-white shadow-lg backdrop-blur-md transition hover:bg-black/40 md:right-5 md:p-3"
             aria-label="下一张"
           >
             <svg
