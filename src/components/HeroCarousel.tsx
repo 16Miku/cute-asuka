@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -34,54 +34,100 @@ export default function HeroCarousel({
   showArrows = true,
 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [preloadWindow, setPreloadWindow] = useState<number[]>([]);
+  /** 手动切换后短暂忽略连点，减少动画未结束时的连跳感 */
+  const lockUntilRef = useRef(0);
 
-  // 根据设备类型选择图片组
   const images = isDesktop ? desktopImages : mobileImages;
+  const len = images.length;
 
-  // 预加载相邻图片，减少切换空白
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const nextIdx = (currentIndex + 1) % images.length;
-    const prevIdx = (currentIndex - 1 + images.length) % images.length;
-    setPreloadWindow([prevIdx, currentIndex, nextIdx]);
-  }, [currentIndex, images.length]);
-
-  // 当设备切换时，重置到第一张
+  // 桌面/移动素材切换时回到第一张
   useEffect(() => {
     setCurrentIndex(0);
   }, [isDesktop]);
 
+  // 索引越界保护（素材列表变化时）
   useEffect(() => {
-    if (images.length <= 1) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+    if (len <= 0) return;
+    setCurrentIndex((i) => (i >= len ? 0 : i));
+  }, [len]);
+
+  useEffect(() => {
+    if (len <= 1) return;
+    const nextIdx = (currentIndex + 1) % len;
+    const prevIdx = (currentIndex - 1 + len) % len;
+    setPreloadWindow([prevIdx, currentIndex, nextIdx]);
+  }, [currentIndex, len]);
+
+  /**
+   * 自动播放：用 setTimeout，并依赖 currentIndex。
+   * 手动切图会改 index → 清理旧定时器 → 重新计满 interval，
+   * 避免「刚点下一张，定时器马上又触发」连跳两张。
+   */
+  useEffect(() => {
+    if (len <= 1 || paused || interval <= 0) return;
+
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const timer = window.setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % len);
     }, interval);
-    return () => clearInterval(timer);
-  }, [images.length, interval]);
+
+    return () => window.clearTimeout(timer);
+  }, [currentIndex, len, interval, paused]);
+
+  const canInteract = useCallback(() => {
+    return performance.now() >= lockUntilRef.current;
+  }, []);
+
+  const armLock = useCallback(() => {
+    // 与过渡时长接近，防止连点堆叠
+    lockUntilRef.current = performance.now() + 420;
+  }, []);
 
   const navigate = useCallback(
     (step: number) => {
+      if (len <= 1 || !canInteract()) return;
+      armLock();
       setCurrentIndex((prev) => {
         const next = prev + step;
-        if (next < 0) return images.length - 1;
-        if (next >= images.length) return 0;
+        if (next < 0) return len - 1;
+        if (next >= len) return 0;
         return next;
       });
     },
-    [images.length]
+    [len, canInteract, armLock]
   );
 
-  const goTo = useCallback((index: number) => {
-    setCurrentIndex(index);
-  }, []);
+  const goTo = useCallback(
+    (index: number) => {
+      if (len <= 1 || !canInteract()) return;
+      if (index === currentIndex) return;
+      armLock();
+      setCurrentIndex(((index % len) + len) % len);
+    },
+    [len, currentIndex, canInteract, armLock]
+  );
 
   const currentImage = images[currentIndex] || "/images/placeholder.jpg";
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      {/* 预加载相邻图片（通过 link 标签） */}
+    <div
+      className="relative h-full w-full overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setPaused(false);
+        }
+      }}
+    >
       {preloadWindow.map((idx) => (
         <link
           key={`preload-${idx}`}
@@ -91,18 +137,14 @@ export default function HeroCarousel({
         />
       ))}
 
-      {/*
-        object-cover + object-top：优先保证画面上方（脸部）不被裁掉。
-        底层模糊仅作切换过渡。
-      */}
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="wait">
         <motion.div
           key={`${isDesktop ? "desktop" : "mobile"}-${currentIndex}`}
-          initial={{ opacity: 0.35 }}
+          initial={{ opacity: 0.25 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0.35 }}
+          exit={{ opacity: 0 }}
           transition={{
-            opacity: { duration: 0.5, ease: "easeInOut" },
+            opacity: { duration: 0.45, ease: "easeInOut" },
           }}
           className="pointer-events-none absolute inset-0 z-0"
         >
@@ -128,11 +170,9 @@ export default function HeroCarousel({
         </motion.div>
       </AnimatePresence>
 
-      {/* 画面保持通透；底部极轻压暗仅服务指示点 */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-14 bg-gradient-to-t from-black/30 to-transparent" />
 
-      {/* 控件层：高于图片与遮罩，保证可点 */}
-      {showArrows && images.length > 1 && (
+      {showArrows && len > 1 && (
         <>
           <button
             type="button"
@@ -183,8 +223,7 @@ export default function HeroCarousel({
         </>
       )}
 
-      {/* 底部指示点 */}
-      {showDots && images.length > 1 && (
+      {showDots && len > 1 && (
         <div className="absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 gap-2 md:bottom-5">
           {images.map((_, index) => (
             <button
@@ -200,6 +239,7 @@ export default function HeroCarousel({
                   : "w-2 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`切换到第 ${index + 1} 张`}
+              aria-current={index === currentIndex ? "true" : undefined}
             />
           ))}
         </div>
