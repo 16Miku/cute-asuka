@@ -360,40 +360,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── TECH STRIP ─── */}
-      <section className="relative z-10 mx-auto max-w-6xl px-4 pb-16">
-        <div className="glass-panel flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
-          <div>
-            <p className="text-[11px] tracking-[0.32em] text-muted-foreground">
-              CRAFT STACK
-            </p>
-            <p className="font-display mt-2 text-xl md:text-2xl">
-              CSS · WebGL2 · Scroll timelines · Glass
-            </p>
-            <p className="mt-2 max-w-lg text-sm text-muted-foreground">
-              程序化极光着色器、滚动进度与视差、胶片无限轨、玻璃拟态信息层——在静态导出约束下仍保持剧院级首屏。
-            </p>
-          </div>
-          <ul className="flex flex-wrap gap-2 text-[11px] tracking-wide">
-            {[
-              "WebGL2 FBM",
-              "scroll-driven UI",
-              "color-mix()",
-              "svh / dvh",
-              "backdrop-filter",
-              "prefers-reduced-motion",
-            ].map((t) => (
-              <li
-                key={t}
-                className="rounded-full border border-border/80 bg-background/50 px-3 py-1.5 text-muted-foreground"
-              >
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
       {/* ─── CTA ─── */}
       <section className="relative z-10 mx-auto max-w-6xl px-4 pb-24 md:pb-32">
         <div className="relative overflow-hidden rounded-[2rem] border border-rose-200/40 bg-gradient-to-br from-rose-100/80 via-fuchsia-50/50 to-amber-50/60 px-6 py-14 text-center shadow-xl shadow-rose-200/30 dark:border-rose-900/40 dark:from-rose-950/60 dark:via-fuchsia-950/40 dark:to-amber-950/30 dark:shadow-none md:px-12 md:py-20">
