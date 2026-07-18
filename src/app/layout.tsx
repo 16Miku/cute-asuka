@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cute Asuka — 斋藤飞鸟表情包站",
   description:
-    "乃木坂风格的沉浸式表情包小站：WebGL 光场、滚动叙事与馆藏画廊。",
+    "沉浸式单页档案：双层 WebGL 光场、滚动叙事、真实馆藏与每日一帧。",
 };
 
 export default function RootLayout({

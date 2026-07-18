@@ -5,7 +5,7 @@
 - **部署地址**: https://cute-asuka.onrender.com/
 - **技术栈**: Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + Framer Motion
 - **部署平台**: Render (Static Site)
-- **当前版本**: v1.7 (2026-07-18)
+- **当前版本**: v2.0-WebGL (分支 `WebGL`，沉浸单页实验)
 
 ## 协作规范
 1. **严格遵循已有的前端架构和样式系统**。
@@ -33,15 +33,17 @@
 - **控件**：箭头与圆点需可点；勿被全屏文案层挡住（文案层用 `pointer-events-none`，按钮 `pointer-events-auto`）
 - **首页文案**：叠在大屏**右下角**，无玻璃底板，仅字影 + 底部轻渐变
 
-### 首页结构（`src/app/page.tsx`）
-1. Hero 轮播 + 右下标题/按钮  
-2. Narrative（信息即情绪）  
-3. Stats（GIF / 静态 / 总计）  
-4. Film Roll（**全部静态馆藏**双轨滚动，来自 `/api/images` 过滤非 gif）  
-5. Portals（三扇门 → gallery / daily / about）  
-6. CTA  
+### 首页结构（`src/app/page.tsx` · WebGL 分支单页）
+1. Hero + 双层 WebGL（`AuroraField` + `PrismField`）+ 可开关光场  
+2. Manifesto 四章信息叙事  
+3. Archive 统计 + 12 帧预览 Lightbox  
+4. Film Roll 全部静态馆藏  
+5. Daily 今日帧（页内完整）  
+6. Portals 深链 + Close CTA  
+7. `SectionNav` 侧栏章节指示  
 
-**已移除**：CRAFT STACK 技术展示条（对粉丝无用）。
+独立路由 `/gallery` `/daily` `/about` 仍保留。  
+**已移除**：CRAFT STACK 技术展示条。
 
 ### 图库与详情
 - **共享逻辑**：`src/lib/gallery.ts`（`filesToItems`、`pickDailyItem`、分类、标题）
