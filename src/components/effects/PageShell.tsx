@@ -7,7 +7,7 @@ import ScrollProgress from "./ScrollProgress";
 /** Shared ambient layer for subpages (lighter aurora than home). */
 export default function PageShell({
   children,
-  intensity = 0.55,
+  intensity = 0.36,
   className = "",
 }: {
   children: ReactNode;

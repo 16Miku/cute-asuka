@@ -1,7 +1,19 @@
-const ids = ["1", "2", "3", "4", "5", "6"];
+import fs from "fs";
+import path from "path";
 
+/** Build-time: one static path per real image in public/images */
 export function generateStaticParams() {
-  return ids.map((id) => ({ id }));
+  const dir = path.resolve(process.cwd(), "public/images");
+  let files: string[] = [];
+  try {
+    files = fs
+      .readdirSync(dir)
+      .filter((f) => /\.(jpg|jpeg|png|gif|webp)$/i.test(f))
+      .sort((a, b) => a.localeCompare(b));
+  } catch {
+    files = [];
+  }
+  return files.map((_, i) => ({ id: String(i + 1) }));
 }
 
 export default function GalleryIdLayout({
