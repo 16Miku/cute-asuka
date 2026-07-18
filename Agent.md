@@ -13,7 +13,7 @@
 3. **提交信息使用详细中文**，例如：`feat(gallery): 增加置顶功能`。
 4. **每次改动都要先 npm run dev 验证效果**。
 5. **推送前运行 npm run build 确认无产出错误**。
-6. **修改 .gitignore 后需同步清理 git 缓存**（如 `git rm -r --cached dist/dev/`）。
+6. **`dist/` 不入库**：部署时由 `npm run build` 生成；修改 `.gitignore` 后需同步 `git rm -r --cached` 清理已跟踪文件。
 
 ## 开发注意事项
 

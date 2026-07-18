@@ -8,5 +8,5 @@ build/
 Thumbs.db
 public/images/*.thumb*
 
-# Next.js 静态导出产物（保留 dist/ 以适配 Render 部署）
-dist/dev/
+# Next.js 静态导出产物（由 Render 的 npm run build 生成，无需入库）
+dist/
